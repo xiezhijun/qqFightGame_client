@@ -1,0 +1,25 @@
+{
+    "x":0,
+    "type":"Image",
+    "selectedBox":26,
+    "searchKey":"Image,Food",
+    "props":{"y":0,"x":0,"width":50,"skin":"img/cir_yellow.png","presetID":1,"preset":"laya/pages/prefab/Food.prefab","name":"Food","isPresetRoot":true,"height":50},
+    "nodeParent":-1,
+    "maxID":27,
+    "label":"Food",
+    "isDirectory":false,
+    "isAniNode":true,
+    "hasChild":false,
+    "compId":26,
+    "child":[
+        ],
+    "animations":[
+        {
+            "nodes":[
+                ],
+            "name":"ani1",
+            "id":1,
+            "frameRate":24,
+            "action":0
+        }]
+}

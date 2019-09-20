@@ -1,0 +1,15 @@
+syntax = "proto3";
+package pbgo;
+
+// 登录消息
+message Login {
+    int32  sex = 1;
+    string nickName = 2;
+    string userName = 3;
+    string pwd = 4;
+    bool isRegis = 5;
+}
+message LoginAck {
+    int32 code = 1; // 返回码
+    Player player = 2;
+}

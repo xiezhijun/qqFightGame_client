@@ -1,0 +1,4 @@
+https://blog.csdn.net/hawu_hao/article/details/82909396
+
+1、在项目根目录cmd运行命令    pb-egret generate
+2、编译后，将protobuf/bundles/protobuf-library.js 替换/bin/libs/probuf-library.js

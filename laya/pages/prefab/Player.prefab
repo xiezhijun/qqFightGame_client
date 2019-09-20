@@ -1,0 +1,25 @@
+{
+    "x":0,
+    "type":"Sprite",
+    "selectedBox":34,
+    "searchKey":"Sprite,Player",
+    "props":{"y":0,"x":0,"width":80,"texture":"img/cir_blue.png","presetID":1,"preset":"laya/pages/prefab/Player.prefab","name":"Player","isPresetRoot":true,"height":80},
+    "nodeParent":-1,
+    "maxID":35,
+    "label":"Player",
+    "isDirectory":false,
+    "isAniNode":true,
+    "hasChild":false,
+    "compId":34,
+    "child":[
+        ],
+    "animations":[
+        {
+            "nodes":[
+                ],
+            "name":"ani1",
+            "id":1,
+            "frameRate":24,
+            "action":0
+        }]
+}
