@@ -13,6 +13,11 @@ class Player{
         this.r = 0;
         // 速度
         this.speed = 0;
+
+        this.isDead = false;
+
+        // 移动的数据帧
+        this.moveFrames = [];
     }
     
 }

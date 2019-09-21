@@ -12,7 +12,8 @@ function initProto() {
         ["pbgo.EnterGame", pbgo.EnterGame],
         ["pbgo.EnterGameAck", pbgo.EnterGameAck],
         ["pbgo.Refresh", pbgo.Refresh],
-        ["pbgo.OperateMsg", pbgo.OperateMsg]
+        ["pbgo.OperateMsg", pbgo.OperateMsg],
+        ["pbgo.UploadPos", pbgo.UploadPos]
     ]);
 }
 

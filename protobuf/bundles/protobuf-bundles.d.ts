@@ -191,6 +191,9 @@ declare namespace pbgo {
 
         /** Player speed */
         speed?: (number|null);
+
+        /** Player moveFrames */
+        moveFrames?: (pbgo.IMoveFrame[]|null);
     }
 
     /** Represents a Player. */
@@ -219,6 +222,9 @@ declare namespace pbgo {
 
         /** Player speed. */
         public speed: number;
+
+        /** Player moveFrames. */
+        public moveFrames: pbgo.IMoveFrame[];
 
         /**
          * Creates a new Player instance using the specified properties.
@@ -669,6 +675,168 @@ declare namespace pbgo {
 
         /**
          * Verifies an OperateMsg message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+    }
+
+    /** Properties of an UploadPos. */
+    interface IUploadPos {
+
+        /** UploadPos centerX */
+        centerX?: (number|null);
+
+        /** UploadPos centerY */
+        centerY?: (number|null);
+
+        /** UploadPos mod */
+        mod?: (number|null);
+    }
+
+    /** Represents an UploadPos. */
+    class UploadPos implements IUploadPos {
+
+        /**
+         * Constructs a new UploadPos.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: pbgo.IUploadPos);
+
+        /** UploadPos centerX. */
+        public centerX: number;
+
+        /** UploadPos centerY. */
+        public centerY: number;
+
+        /** UploadPos mod. */
+        public mod: number;
+
+        /**
+         * Creates a new UploadPos instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns UploadPos instance
+         */
+        public static create(properties?: pbgo.IUploadPos): pbgo.UploadPos;
+
+        /**
+         * Encodes the specified UploadPos message. Does not implicitly {@link pbgo.UploadPos.verify|verify} messages.
+         * @param message UploadPos message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: pbgo.IUploadPos, writer?: protobuf.Writer): protobuf.Writer;
+
+        /**
+         * Encodes the specified UploadPos message, length delimited. Does not implicitly {@link pbgo.UploadPos.verify|verify} messages.
+         * @param message UploadPos message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: pbgo.IUploadPos, writer?: protobuf.Writer): protobuf.Writer;
+
+        /**
+         * Decodes an UploadPos message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns UploadPos
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: (protobuf.Reader|Uint8Array), length?: number): pbgo.UploadPos;
+
+        /**
+         * Decodes an UploadPos message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns UploadPos
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: (protobuf.Reader|Uint8Array)): pbgo.UploadPos;
+
+        /**
+         * Verifies an UploadPos message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+    }
+
+    /** Properties of a MoveFrame. */
+    interface IMoveFrame {
+
+        /** MoveFrame centerX */
+        centerX?: (number|null);
+
+        /** MoveFrame centerY */
+        centerY?: (number|null);
+
+        /** MoveFrame r */
+        r?: (number|null);
+    }
+
+    /** Represents a MoveFrame. */
+    class MoveFrame implements IMoveFrame {
+
+        /**
+         * Constructs a new MoveFrame.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: pbgo.IMoveFrame);
+
+        /** MoveFrame centerX. */
+        public centerX: number;
+
+        /** MoveFrame centerY. */
+        public centerY: number;
+
+        /** MoveFrame r. */
+        public r: number;
+
+        /**
+         * Creates a new MoveFrame instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns MoveFrame instance
+         */
+        public static create(properties?: pbgo.IMoveFrame): pbgo.MoveFrame;
+
+        /**
+         * Encodes the specified MoveFrame message. Does not implicitly {@link pbgo.MoveFrame.verify|verify} messages.
+         * @param message MoveFrame message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: pbgo.IMoveFrame, writer?: protobuf.Writer): protobuf.Writer;
+
+        /**
+         * Encodes the specified MoveFrame message, length delimited. Does not implicitly {@link pbgo.MoveFrame.verify|verify} messages.
+         * @param message MoveFrame message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: pbgo.IMoveFrame, writer?: protobuf.Writer): protobuf.Writer;
+
+        /**
+         * Decodes a MoveFrame message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns MoveFrame
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: (protobuf.Reader|Uint8Array), length?: number): pbgo.MoveFrame;
+
+        /**
+         * Decodes a MoveFrame message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns MoveFrame
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: (protobuf.Reader|Uint8Array)): pbgo.MoveFrame;
+
+        /**
+         * Verifies a MoveFrame message.
          * @param message Plain object to verify
          * @returns `null` if valid, otherwise the reason why it is not
          */

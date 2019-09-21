@@ -20,9 +20,6 @@ function startWS(host, port) {
 //建立链接
 function openHandler(event){
     console.log("Open websocket")
-    let enterGameMsg = pbgo.EnterGame.create();
-    enterGameMsg.playerID = -1;
-    sendMsg(CMD_ENTER_GAME, enterGameMsg);
 }
 
 //收到消息

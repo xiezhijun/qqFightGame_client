@@ -43,3 +43,10 @@ message OperateMsg {
     int32 maxHeight = 3;
     int32 mod = 4;
 }
+
+// 客户端计算后，上报位置
+message UploadPos {
+    int32 centerX = 1;
+    int32 centerY = 2;
+    int32 mod = 3;
+}

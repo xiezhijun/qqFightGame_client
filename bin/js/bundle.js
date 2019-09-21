@@ -30,6 +30,10 @@
             // 玩家自己操作的次数，用来校验服务器推送的位置信息与本地的位置不一致的问题
             // 如果服务器推送的mod < this.mode，那么说明服务器还有没推送完的 mod，直接以本地位置为主
             this.mod = 0;
+
+            this.rocker = null;
+
+            this.controller = null;
         }
 
         /**键盘按下处理*/
@@ -50,7 +54,7 @@
                         }
                     }
 
-                    this.recalSelf();
+                    this.recalPlayerNode(this.selfPlayer);
                     this.sendOperateToServer(code);
                     break;
                 }
@@ -62,7 +66,7 @@
                         this.selfPlayer.centerX += DELT;
                     }
 
-                    this.recalSelf();
+                    this.recalPlayerNode(this.selfPlayer);
                     this.sendOperateToServer(code);
                     break;
                 }
@@ -76,7 +80,7 @@
                         }
                     }
 
-                    this.recalSelf();
+                    this.recalPlayerNode(this.selfPlayer);
                     this.sendOperateToServer(code);
                     break;
                 }
@@ -88,7 +92,7 @@
                         this.selfPlayer.centerY += DELT;
                     }
 
-                    this.recalSelf();
+                    this.recalPlayerNode(this.selfPlayer);
                     this.sendOperateToServer(code);
                     break;
                 }
@@ -97,11 +101,21 @@
             }
         }
 
-        recalSelf() {
-            this.selfPlayerNode.x = this.selfPlayer.centerX - this.selfPlayer.r;
-            this.selfPlayerNode.y = this.selfPlayer.centerY - this.selfPlayer.r;
-            this.selfPlayerNode.width = this.selfPlayer.r * 2;
-            this.selfPlayerNode.height = this.selfPlayerNode.width;
+        // 重新计算
+        recalPlayerNode(player) {
+            let pNode = this.owner.getChildByName("player" + player.playerID);
+            if(pNode == null) {
+                return
+            }
+            pNode.x = player.centerX - player.r;
+            pNode.y = player.centerY - player.r;
+            pNode.width = player.r * 2;
+            pNode.height = pNode.width;
+            pNode.name = "player" + player.playerID;
+
+            let nameTxtNode = pNode.getChildByName("PlayerName");
+            nameTxtNode.width = pNode.width;
+            nameTxtNode.height = pNode.height;
         }
         
         sendOperateToServer(code) {
@@ -119,23 +133,33 @@
     	}
         
         onEnable() {
-            //添加键盘按下事件,一直按着某按键则会不断触发
-    		Laya.stage.on(Event.KEY_DOWN, this, this.onKeyDown);
-    		//添加键盘抬起事件
-            Laya.stage.on(Event.KEY_UP, this, this.onKeyUp);
+            // //添加键盘按下事件,一直按着某按键则会不断触发
+    		// Laya.stage.on(Event.KEY_DOWN, this, this.onKeyDown);
+    		// //添加键盘抬起事件
+            // Laya.stage.on(Event.KEY_UP, this, this.onKeyUp);
 
             game = this;
+
+
+            // 发送进入游戏的消息
+            let enterGameMsg = pbgo.EnterGame.create();
+            enterGameMsg.playerID = -1;
+            sendMsg(CMD_ENTER_GAME, enterGameMsg);
         }
 
         onDisable() {
         }
 
         onUpdate() {
+            this.frameRefresh();
+        }
+
+        frameRefresh() {
             let num = this.refreshMsgArray.length;
             if(num > 0) {
                 // 每帧处理的消息设定最大值，防止帧数太低
-                if(num > 10) {
-                    num = 10;
+                if(num > 1) {
+                    num = 1;
                 }
                 for (let index = 0; index < num; index++) {
                     let msg = this.refreshMsgArray.shift();
@@ -143,9 +167,24 @@
                         let player = msg.players[idx];
 
                         if(player.playerID == this.selfPlayer.playerID) {
-                            if(this.selfPlayer.r != player.r) {
+                            // 死亡了
+                            if(this.selfPlayer.isDead) {
+                                console.log("玩家自己死亡后复活。。。。重新创建");
+                                this.selfPlayer.centerX = player.centerX;
+                                this.selfPlayer.centerY = player.centerY;
+                                this.selfPlayer.mod = player.mod;
+                                this.selfPlayer.isDead = false;
+                                this.playerMap.set(this.selfPlayer.playerID, this.selfPlayer);
+                                this.createPlayerNode(this.selfPlayer);
+                                continue;
+                            }
+                            if(this.selfPlayer.r != player.r 
+                                || this.selfPlayer.centerX != player.centerX
+                                || this.selfPlayer.centerY != player.centerY) {
                                 this.selfPlayer.r = player.r;
-                                this.recalSelf();
+                                this.selfPlayer.centerX = player.centerX;
+                                this.selfPlayer.centerY = player.centerY;
+                                this.recalPlayerNode(this.selfPlayer);
                             }
                             if(msg.selfMod < this.mod) {
                                 continue;
@@ -156,14 +195,21 @@
                         // 没有该节点，需要加入
                         if(playerNode == null) {
                             playerNode = this.createPlayerNode(player);
+
+                            let p = new(Player);
+                            p.centerX = player.centerX;
+                            p.centerY = player.centerY;
+                            p.r = player.r;
+                            p.playerID = player.playerID;
+                            p.playerName = player.playerName;
+                            this.playerMap.set(player.playerID, p);
                         }
 
-                        playerNode.x = player.centerX - player.r;
-                        playerNode.y = player.centerY - player.r;
-                        playerNode.width = player.r*2;
-                        playerNode.height = playerNode.width;
-
-                        this.playerMap.set(player.playerID, player);
+                        // 移动数据帧
+                        let p = this.playerMap.get(player.playerID);
+                        for(let i=0; i<player.moveFrames.length; i++) {
+                            p.moveFrames.push(player.moveFrames[i]);
+                        }
                     }
                     
                     for (const idx in msg.foods) {
@@ -196,6 +242,10 @@
                                 console.log("delete player " + value.playerID);
                                 this.playerMap.delete(value.playerID);
                                 this.owner.getChildByName("player"+value.playerID).destroy();
+
+                                if(value.playerID == this.selfPlayer.playerID) {
+                                    this.selfPlayer.isDead = true;
+                                }
                             }
                         }
 
@@ -210,7 +260,7 @@
                                 }
                             }
                             if(!found) {
-                                console.log("delete food " + value.id);
+                                // console.log("delete food " + value.id);
                                 this.foodMap.delete(value.id);
                                 this.owner.getChildByName("food"+value.id).destroy();
                             }
@@ -228,7 +278,16 @@
             pNode.width = player.r * 2;
             pNode.height = pNode.width;
             pNode.name = "player" + player.playerID;
+
+            let nameTxtNode = pNode.getChildByName("PlayerName");
+            nameTxtNode.text = player.playerName;
+            nameTxtNode.x = pNode.x;
+            nameTxtNode.y = pNode.y;
+            nameTxtNode.width = pNode.width;
+            nameTxtNode.height = pNode.height;
+
             this.owner.addChild(pNode);
+            console.log("创建玩家 ::" + player.playerName);
             return pNode;
         }
 
@@ -246,7 +305,7 @@
 
         // 进入游戏
         enterGame(enterGameAck) {
-            console.log('enter');
+            console.log('enter game');
 
             
             let player = new(Player);
@@ -284,6 +343,8 @@
 
                 this.createFoodNode(food);
             }
+
+            this.controller = new(Control);
         }
 
         // 服务器通知刷新同步

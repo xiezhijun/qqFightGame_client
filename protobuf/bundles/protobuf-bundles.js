@@ -392,6 +392,7 @@ $root.pbgo = (function() {
          * @property {number|null} [centerY] Player centerY
          * @property {number|null} [r] Player r
          * @property {number|null} [speed] Player speed
+         * @property {Array.<pbgo.IMoveFrame>|null} [moveFrames] Player moveFrames
          */
 
         /**
@@ -403,6 +404,7 @@ $root.pbgo = (function() {
          * @param {pbgo.IPlayer=} [properties] Properties to set
          */
         function Player(properties) {
+            this.moveFrames = [];
             if (properties)
                 for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null)
@@ -458,6 +460,14 @@ $root.pbgo = (function() {
         Player.prototype.speed = 0;
 
         /**
+         * Player moveFrames.
+         * @member {Array.<pbgo.IMoveFrame>} moveFrames
+         * @memberof pbgo.Player
+         * @instance
+         */
+        Player.prototype.moveFrames = $util.emptyArray;
+
+        /**
          * Creates a new Player instance using the specified properties.
          * @function create
          * @memberof pbgo.Player
@@ -493,6 +503,9 @@ $root.pbgo = (function() {
                 writer.uint32(/* id 5, wireType 0 =*/40).int32(message.r);
             if (message.speed != null && message.hasOwnProperty("speed"))
                 writer.uint32(/* id 6, wireType 0 =*/48).int32(message.speed);
+            if (message.moveFrames != null && message.moveFrames.length)
+                for (var i = 0; i < message.moveFrames.length; ++i)
+                    $root.pbgo.MoveFrame.encode(message.moveFrames[i], writer.uint32(/* id 7, wireType 2 =*/58).fork()).ldelim();
             return writer;
         };
 
@@ -544,6 +557,11 @@ $root.pbgo = (function() {
                     break;
                 case 6:
                     message.speed = reader.int32();
+                    break;
+                case 7:
+                    if (!(message.moveFrames && message.moveFrames.length))
+                        message.moveFrames = [];
+                    message.moveFrames.push($root.pbgo.MoveFrame.decode(reader, reader.uint32()));
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -598,6 +616,15 @@ $root.pbgo = (function() {
             if (message.speed != null && message.hasOwnProperty("speed"))
                 if (!$util.isInteger(message.speed))
                     return "speed: integer expected";
+            if (message.moveFrames != null && message.hasOwnProperty("moveFrames")) {
+                if (!Array.isArray(message.moveFrames))
+                    return "moveFrames: array expected";
+                for (var i = 0; i < message.moveFrames.length; ++i) {
+                    var error = $root.pbgo.MoveFrame.verify(message.moveFrames[i]);
+                    if (error)
+                        return "moveFrames." + error;
+                }
+            }
             return null;
         };
 
@@ -1509,6 +1536,352 @@ $root.pbgo = (function() {
         };
 
         return OperateMsg;
+    })();
+
+    pbgo.UploadPos = (function() {
+
+        /**
+         * Properties of an UploadPos.
+         * @memberof pbgo
+         * @interface IUploadPos
+         * @property {number|null} [centerX] UploadPos centerX
+         * @property {number|null} [centerY] UploadPos centerY
+         * @property {number|null} [mod] UploadPos mod
+         */
+
+        /**
+         * Constructs a new UploadPos.
+         * @memberof pbgo
+         * @classdesc Represents an UploadPos.
+         * @implements IUploadPos
+         * @constructor
+         * @param {pbgo.IUploadPos=} [properties] Properties to set
+         */
+        function UploadPos(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * UploadPos centerX.
+         * @member {number} centerX
+         * @memberof pbgo.UploadPos
+         * @instance
+         */
+        UploadPos.prototype.centerX = 0;
+
+        /**
+         * UploadPos centerY.
+         * @member {number} centerY
+         * @memberof pbgo.UploadPos
+         * @instance
+         */
+        UploadPos.prototype.centerY = 0;
+
+        /**
+         * UploadPos mod.
+         * @member {number} mod
+         * @memberof pbgo.UploadPos
+         * @instance
+         */
+        UploadPos.prototype.mod = 0;
+
+        /**
+         * Creates a new UploadPos instance using the specified properties.
+         * @function create
+         * @memberof pbgo.UploadPos
+         * @static
+         * @param {pbgo.IUploadPos=} [properties] Properties to set
+         * @returns {pbgo.UploadPos} UploadPos instance
+         */
+        UploadPos.create = function create(properties) {
+            return new UploadPos(properties);
+        };
+
+        /**
+         * Encodes the specified UploadPos message. Does not implicitly {@link pbgo.UploadPos.verify|verify} messages.
+         * @function encode
+         * @memberof pbgo.UploadPos
+         * @static
+         * @param {pbgo.IUploadPos} message UploadPos message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        UploadPos.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.centerX != null && message.hasOwnProperty("centerX"))
+                writer.uint32(/* id 1, wireType 0 =*/8).int32(message.centerX);
+            if (message.centerY != null && message.hasOwnProperty("centerY"))
+                writer.uint32(/* id 2, wireType 0 =*/16).int32(message.centerY);
+            if (message.mod != null && message.hasOwnProperty("mod"))
+                writer.uint32(/* id 3, wireType 0 =*/24).int32(message.mod);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified UploadPos message, length delimited. Does not implicitly {@link pbgo.UploadPos.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof pbgo.UploadPos
+         * @static
+         * @param {pbgo.IUploadPos} message UploadPos message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        UploadPos.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes an UploadPos message from the specified reader or buffer.
+         * @function decode
+         * @memberof pbgo.UploadPos
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {pbgo.UploadPos} UploadPos
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        UploadPos.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.pbgo.UploadPos();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                case 1:
+                    message.centerX = reader.int32();
+                    break;
+                case 2:
+                    message.centerY = reader.int32();
+                    break;
+                case 3:
+                    message.mod = reader.int32();
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes an UploadPos message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof pbgo.UploadPos
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {pbgo.UploadPos} UploadPos
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        UploadPos.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies an UploadPos message.
+         * @function verify
+         * @memberof pbgo.UploadPos
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        UploadPos.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.centerX != null && message.hasOwnProperty("centerX"))
+                if (!$util.isInteger(message.centerX))
+                    return "centerX: integer expected";
+            if (message.centerY != null && message.hasOwnProperty("centerY"))
+                if (!$util.isInteger(message.centerY))
+                    return "centerY: integer expected";
+            if (message.mod != null && message.hasOwnProperty("mod"))
+                if (!$util.isInteger(message.mod))
+                    return "mod: integer expected";
+            return null;
+        };
+
+        return UploadPos;
+    })();
+
+    pbgo.MoveFrame = (function() {
+
+        /**
+         * Properties of a MoveFrame.
+         * @memberof pbgo
+         * @interface IMoveFrame
+         * @property {number|null} [centerX] MoveFrame centerX
+         * @property {number|null} [centerY] MoveFrame centerY
+         * @property {number|null} [r] MoveFrame r
+         */
+
+        /**
+         * Constructs a new MoveFrame.
+         * @memberof pbgo
+         * @classdesc Represents a MoveFrame.
+         * @implements IMoveFrame
+         * @constructor
+         * @param {pbgo.IMoveFrame=} [properties] Properties to set
+         */
+        function MoveFrame(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * MoveFrame centerX.
+         * @member {number} centerX
+         * @memberof pbgo.MoveFrame
+         * @instance
+         */
+        MoveFrame.prototype.centerX = 0;
+
+        /**
+         * MoveFrame centerY.
+         * @member {number} centerY
+         * @memberof pbgo.MoveFrame
+         * @instance
+         */
+        MoveFrame.prototype.centerY = 0;
+
+        /**
+         * MoveFrame r.
+         * @member {number} r
+         * @memberof pbgo.MoveFrame
+         * @instance
+         */
+        MoveFrame.prototype.r = 0;
+
+        /**
+         * Creates a new MoveFrame instance using the specified properties.
+         * @function create
+         * @memberof pbgo.MoveFrame
+         * @static
+         * @param {pbgo.IMoveFrame=} [properties] Properties to set
+         * @returns {pbgo.MoveFrame} MoveFrame instance
+         */
+        MoveFrame.create = function create(properties) {
+            return new MoveFrame(properties);
+        };
+
+        /**
+         * Encodes the specified MoveFrame message. Does not implicitly {@link pbgo.MoveFrame.verify|verify} messages.
+         * @function encode
+         * @memberof pbgo.MoveFrame
+         * @static
+         * @param {pbgo.IMoveFrame} message MoveFrame message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        MoveFrame.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.centerX != null && message.hasOwnProperty("centerX"))
+                writer.uint32(/* id 1, wireType 0 =*/8).int32(message.centerX);
+            if (message.centerY != null && message.hasOwnProperty("centerY"))
+                writer.uint32(/* id 2, wireType 0 =*/16).int32(message.centerY);
+            if (message.r != null && message.hasOwnProperty("r"))
+                writer.uint32(/* id 3, wireType 0 =*/24).int32(message.r);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified MoveFrame message, length delimited. Does not implicitly {@link pbgo.MoveFrame.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof pbgo.MoveFrame
+         * @static
+         * @param {pbgo.IMoveFrame} message MoveFrame message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        MoveFrame.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a MoveFrame message from the specified reader or buffer.
+         * @function decode
+         * @memberof pbgo.MoveFrame
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {pbgo.MoveFrame} MoveFrame
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        MoveFrame.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.pbgo.MoveFrame();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                case 1:
+                    message.centerX = reader.int32();
+                    break;
+                case 2:
+                    message.centerY = reader.int32();
+                    break;
+                case 3:
+                    message.r = reader.int32();
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a MoveFrame message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof pbgo.MoveFrame
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {pbgo.MoveFrame} MoveFrame
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        MoveFrame.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a MoveFrame message.
+         * @function verify
+         * @memberof pbgo.MoveFrame
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        MoveFrame.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.centerX != null && message.hasOwnProperty("centerX"))
+                if (!$util.isInteger(message.centerX))
+                    return "centerX: integer expected";
+            if (message.centerY != null && message.hasOwnProperty("centerY"))
+                if (!$util.isInteger(message.centerY))
+                    return "centerY: integer expected";
+            if (message.r != null && message.hasOwnProperty("r"))
+                if (!$util.isInteger(message.r))
+                    return "r: integer expected";
+            return null;
+        };
+
+        return MoveFrame;
     })();
 
     return pbgo;
