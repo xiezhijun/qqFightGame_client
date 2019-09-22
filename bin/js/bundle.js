@@ -393,7 +393,7 @@
         }
     }
 
-    GlobalConfig.wsHost = "localhost";
+    GlobalConfig.wsHost = "172.30.0.5";
     GlobalConfig.wsPort = 1212;
 
     class Main {
