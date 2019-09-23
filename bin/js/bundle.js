@@ -15,6 +15,9 @@
             /** @prop {name:prePlayer, tips:"玩家预设", type:Prefab, default:null}*/
             this.prePlayer = null;
 
+            /** @prop {name:prePlayerSelf, tips:"玩家自己预设", type:Prefab, default:null}*/
+            this.prePlayerSelf = null;
+
             // 玩家自己
             this.selfPlayer = null;
 
@@ -31,80 +34,16 @@
             // 如果服务器推送的mod < this.mode，那么说明服务器还有没推送完的 mod，直接以本地位置为主
             this.mod = 0;
 
-            this.rocker = null;
-
             this.controller = null;
-        }
 
-        /**键盘按下处理*/
-    	onKeyDown(e) {
-            // 使用按键池监听多个按键同时按下的操作，如左上，右下等方向控制
-            // 延迟一定时间，再进行处理
-
-            // 操作后，客户端直接先计算移动
-            let code = e["keyCode"];
-            switch(code) {
-                case LEFT:{
-                    if(this.selfPlayer.centerX - this.selfPlayer.r > 0) {
-                        let value = this.selfPlayer.centerX - this.selfPlayer.r - DELT;
-                        if(value >= 0) {
-                            this.selfPlayer.centerX -= DELT;
-                        } else {
-                            this.selfPlayer.centerX += value;
-                        }
-                    }
-
-                    this.recalPlayerNode(this.selfPlayer);
-                    this.sendOperateToServer(code);
-                    break;
-                }
-                case RIGHT:{
-                    let value = this.selfPlayer.centerX + this.selfPlayer.r + DELT;
-                    if(value >= Laya.stage.width) {
-                        this.selfPlayer.centerX += Laya.stage.width - this.selfPlayer.centerX - this.selfPlayer.r;
-                    } else {
-                        this.selfPlayer.centerX += DELT;
-                    }
-
-                    this.recalPlayerNode(this.selfPlayer);
-                    this.sendOperateToServer(code);
-                    break;
-                }
-                case UP:{
-                    if(this.selfPlayer.centerY - this.selfPlayer.r > 0) {
-                        let value = this.selfPlayer.centerY - this.selfPlayer.r - DELT;
-                        if(value >= 0) {
-                            this.selfPlayer.centerY -= DELT;
-                        } else {
-                            this.selfPlayer.centerY += value;
-                        }
-                    }
-
-                    this.recalPlayerNode(this.selfPlayer);
-                    this.sendOperateToServer(code);
-                    break;
-                }
-                case DOWN:{
-                    let value = this.selfPlayer.centerY + this.selfPlayer.r + DELT;
-                    if(value > Laya.stage.height) {
-                        this.selfPlayer.centerY += Laya.stage.height - this.selfPlayer.centerY - this.selfPlayer.r;
-                    } else {
-                        this.selfPlayer.centerY += DELT;
-                    }
-
-                    this.recalPlayerNode(this.selfPlayer);
-                    this.sendOperateToServer(code);
-                    break;
-                }
-                default:
-                    break;
-            }
+            this.sendEnterGameMsg = false;
         }
 
         // 重新计算
         recalPlayerNode(player) {
             let pNode = this.owner.getChildByName("player" + player.playerID);
             if(pNode == null) {
+                console.log("recal player" +player.playerID+ " node is null");
                 return
             }
             pNode.x = player.centerX - player.r;
@@ -118,39 +57,24 @@
             nameTxtNode.height = pNode.height;
         }
         
-        sendOperateToServer(code) {
-            this.mod++;
-            let proto = pbgo.OperateMsg.create();
-            proto.opCode = code;
-            proto.maxWidth = Laya.stage.width;
-            proto.maxHeight = Laya.stage.height;
-            proto.mod = this.mod;
-            sendMsg(CMD_OPERATE, proto);
-        }
-
-    	/**键盘抬起处理*/
-    	onKeyUp(e) {
-    	}
-        
         onEnable() {
-            // //添加键盘按下事件,一直按着某按键则会不断触发
-    		// Laya.stage.on(Event.KEY_DOWN, this, this.onKeyDown);
-    		// //添加键盘抬起事件
-            // Laya.stage.on(Event.KEY_UP, this, this.onKeyUp);
-
             game = this;
-
-
-            // 发送进入游戏的消息
-            let enterGameMsg = pbgo.EnterGame.create();
-            enterGameMsg.playerID = -1;
-            sendMsg(CMD_ENTER_GAME, enterGameMsg);
         }
 
         onDisable() {
+            console.log("disable");
         }
 
         onUpdate() {
+            // 发送进入游戏的消息
+            if(!this.sendEnterGameMsg && socketConnected) {
+                console.log("send");
+                this.sendEnterGameMsg = true;
+                let enterGameMsg = pbgo.EnterGame.create();
+                enterGameMsg.playerID = -1;
+                sendMsg(CMD_ENTER_GAME, enterGameMsg);
+            }
+
             this.frameRefresh();
         }
 
@@ -166,21 +90,22 @@
                     for (const idx in msg.players) {
                         let player = msg.players[idx];
 
+                        // 处理自己节点的逻辑
                         if(player.playerID == this.selfPlayer.playerID) {
                             // 死亡了
                             if(this.selfPlayer.isDead) {
                                 console.log("玩家自己死亡后复活。。。。重新创建");
                                 this.selfPlayer.centerX = player.centerX;
                                 this.selfPlayer.centerY = player.centerY;
+                                this.selfPlayer.r = player.r;
+                                this.selfPlayer.speed = player.speed;
                                 this.selfPlayer.mod = player.mod;
                                 this.selfPlayer.isDead = false;
                                 this.playerMap.set(this.selfPlayer.playerID, this.selfPlayer);
                                 this.createPlayerNode(this.selfPlayer);
                                 continue;
                             }
-                            if(this.selfPlayer.r != player.r 
-                                || this.selfPlayer.centerX != player.centerX
-                                || this.selfPlayer.centerY != player.centerY) {
+                            if(this.selfPlayer.r < player.r) {
                                 this.selfPlayer.r = player.r;
                                 this.selfPlayer.centerX = player.centerX;
                                 this.selfPlayer.centerY = player.centerY;
@@ -189,24 +114,33 @@
                             if(msg.selfMod < this.mod) {
                                 continue;
                             }
+                            if(this.selfPlayer.centerX != player.centerX
+                                || this.selfPlayer.centerY != player.centerY) {
+                                this.selfPlayer.r = player.r;
+                                this.selfPlayer.centerX = player.centerX;
+                                this.selfPlayer.centerY = player.centerY;
+                                this.recalPlayerNode(this.selfPlayer);
+                            }
+                            continue;
                         }
 
-                        let playerNode = this.owner.getChildByName("player" +player.playerID);
+                        // 处理其他节点
+                        let p = this.playerMap.get(player.playerID);
                         // 没有该节点，需要加入
-                        if(playerNode == null) {
-                            playerNode = this.createPlayerNode(player);
-
-                            let p = new(Player);
+                        if(p == null) {
+                            p = new(Player);
                             p.centerX = player.centerX;
                             p.centerY = player.centerY;
                             p.r = player.r;
+                            p.speed = player.speed;
                             p.playerID = player.playerID;
                             p.playerName = player.playerName;
                             this.playerMap.set(player.playerID, p);
+
+                            this.createPlayerNode(p);
                         }
 
                         // 移动数据帧
-                        let p = this.playerMap.get(player.playerID);
                         for(let i=0; i<player.moveFrames.length; i++) {
                             p.moveFrames.push(player.moveFrames[i]);
                         }
@@ -272,12 +206,21 @@
 
         // 根据player对象创建节点对象
         createPlayerNode(player) {
-            let pNode = this.prePlayer.create();
+            // 玩家自己进行区分
+            let pNode = null;
+            if(player.playerID == this.selfPlayer.playerID) {
+                console.log("玩家自己，加载区分的图片....");
+                pNode = this.prePlayerSelf.create();
+            } else {
+                pNode = this.prePlayer.create();
+            }
+            
             pNode.x = player.centerX - player.r;
             pNode.y = player.centerY - player.r;
             pNode.width = player.r * 2;
             pNode.height = pNode.width;
             pNode.name = "player" + player.playerID;
+
 
             let nameTxtNode = pNode.getChildByName("PlayerName");
             nameTxtNode.text = player.playerName;
@@ -312,6 +255,7 @@
             player.centerX = enterGameAck.self.centerX;
             player.centerY = enterGameAck.self.centerY;
             player.r = enterGameAck.self.r;
+            player.speed = enterGameAck.self.speed;
             player.playerID = enterGameAck.self.playerID;
             player.playerName = enterGameAck.self.playerName;
             this.playerMap.set(player.playerID, player);
@@ -393,7 +337,7 @@
         }
     }
 
-    GlobalConfig.wsHost = "172.30.0.5";
+    GlobalConfig.wsHost = "127.0.0.1";
     GlobalConfig.wsPort = 1212;
 
     class Main {

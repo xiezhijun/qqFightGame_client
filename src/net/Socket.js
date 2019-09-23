@@ -1,4 +1,5 @@
 var socket;
+var socketConnected = false;
 
 
  /**
@@ -20,6 +21,7 @@ function startWS(host, port) {
 //建立链接
 function openHandler(event){
     console.log("Open websocket")
+    socketConnected = true;
 }
 
 //收到消息
@@ -41,6 +43,9 @@ function errorHandler(e){
 
 // 发送消息
 function sendMsg(cmd, proto) {
+    if(!socketConnected) {
+        return
+    }
     let netMessage = new NetMessage();
     netMessage.msgCmd = cmd;
     netMessage.proto = proto;

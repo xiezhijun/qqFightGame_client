@@ -5,17 +5,18 @@ package pbgo;
 message Player {
     int32 playerID = 1;
     string playerName = 2;
-    int32 centerX = 3;
-    int32 centerY = 4;
-    int32 r = 5;
+    float centerX = 3;
+    float centerY = 4;
+    float r = 5;
     int32 speed = 6;
+    repeated MoveFrame moveFrames = 7;
 }
 
 message Food {
     int32 id = 1;
-    int32 centerX = 2;
-    int32 centerY = 3;
-    int32 r = 4;
+    float centerX = 2;
+    float centerY = 3;
+    float r = 4;
 }
 
 // 进入游戏
@@ -36,17 +37,24 @@ message Refresh {
     int32 selfMod = 3;
 }
 
-// 上下左右操作
+// 操作
 message OperateMsg {
-    int32 opCode = 1;
-    int32 maxWidth = 2;
-    int32 maxHeight = 3;
+    float angle = 1;
+    float maxWidth = 2;
+    float maxHeight = 3;
     int32 mod = 4;
 }
 
 // 客户端计算后，上报位置
 message UploadPos {
-    int32 centerX = 1;
-    int32 centerY = 2;
+    float centerX = 1;
+    float centerY = 2;
     int32 mod = 3;
+}
+
+// 移动数据帧
+message MoveFrame {
+    float centerX = 1;
+    float centerY = 2;
+    float r = 3;
 }

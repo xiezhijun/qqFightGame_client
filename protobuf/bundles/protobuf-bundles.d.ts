@@ -597,8 +597,8 @@ declare namespace pbgo {
     /** Properties of an OperateMsg. */
     interface IOperateMsg {
 
-        /** OperateMsg opCode */
-        opCode?: (number|null);
+        /** OperateMsg angle */
+        angle?: (number|null);
 
         /** OperateMsg maxWidth */
         maxWidth?: (number|null);
@@ -619,8 +619,8 @@ declare namespace pbgo {
          */
         constructor(properties?: pbgo.IOperateMsg);
 
-        /** OperateMsg opCode. */
-        public opCode: number;
+        /** OperateMsg angle. */
+        public angle: number;
 
         /** OperateMsg maxWidth. */
         public maxWidth: number;

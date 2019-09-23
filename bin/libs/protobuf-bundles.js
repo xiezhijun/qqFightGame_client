@@ -496,11 +496,11 @@ $root.pbgo = (function() {
             if (message.playerName != null && message.hasOwnProperty("playerName"))
                 writer.uint32(/* id 2, wireType 2 =*/18).string(message.playerName);
             if (message.centerX != null && message.hasOwnProperty("centerX"))
-                writer.uint32(/* id 3, wireType 0 =*/24).int32(message.centerX);
+                writer.uint32(/* id 3, wireType 5 =*/29).float(message.centerX);
             if (message.centerY != null && message.hasOwnProperty("centerY"))
-                writer.uint32(/* id 4, wireType 0 =*/32).int32(message.centerY);
+                writer.uint32(/* id 4, wireType 5 =*/37).float(message.centerY);
             if (message.r != null && message.hasOwnProperty("r"))
-                writer.uint32(/* id 5, wireType 0 =*/40).int32(message.r);
+                writer.uint32(/* id 5, wireType 5 =*/45).float(message.r);
             if (message.speed != null && message.hasOwnProperty("speed"))
                 writer.uint32(/* id 6, wireType 0 =*/48).int32(message.speed);
             if (message.moveFrames != null && message.moveFrames.length)
@@ -547,13 +547,13 @@ $root.pbgo = (function() {
                     message.playerName = reader.string();
                     break;
                 case 3:
-                    message.centerX = reader.int32();
+                    message.centerX = reader.float();
                     break;
                 case 4:
-                    message.centerY = reader.int32();
+                    message.centerY = reader.float();
                     break;
                 case 5:
-                    message.r = reader.int32();
+                    message.r = reader.float();
                     break;
                 case 6:
                     message.speed = reader.int32();
@@ -605,14 +605,14 @@ $root.pbgo = (function() {
                 if (!$util.isString(message.playerName))
                     return "playerName: string expected";
             if (message.centerX != null && message.hasOwnProperty("centerX"))
-                if (!$util.isInteger(message.centerX))
-                    return "centerX: integer expected";
+                if (typeof message.centerX !== "number")
+                    return "centerX: number expected";
             if (message.centerY != null && message.hasOwnProperty("centerY"))
-                if (!$util.isInteger(message.centerY))
-                    return "centerY: integer expected";
+                if (typeof message.centerY !== "number")
+                    return "centerY: number expected";
             if (message.r != null && message.hasOwnProperty("r"))
-                if (!$util.isInteger(message.r))
-                    return "r: integer expected";
+                if (typeof message.r !== "number")
+                    return "r: number expected";
             if (message.speed != null && message.hasOwnProperty("speed"))
                 if (!$util.isInteger(message.speed))
                     return "speed: integer expected";
@@ -717,11 +717,11 @@ $root.pbgo = (function() {
             if (message.id != null && message.hasOwnProperty("id"))
                 writer.uint32(/* id 1, wireType 0 =*/8).int32(message.id);
             if (message.centerX != null && message.hasOwnProperty("centerX"))
-                writer.uint32(/* id 2, wireType 0 =*/16).int32(message.centerX);
+                writer.uint32(/* id 2, wireType 5 =*/21).float(message.centerX);
             if (message.centerY != null && message.hasOwnProperty("centerY"))
-                writer.uint32(/* id 3, wireType 0 =*/24).int32(message.centerY);
+                writer.uint32(/* id 3, wireType 5 =*/29).float(message.centerY);
             if (message.r != null && message.hasOwnProperty("r"))
-                writer.uint32(/* id 4, wireType 0 =*/32).int32(message.r);
+                writer.uint32(/* id 4, wireType 5 =*/37).float(message.r);
             return writer;
         };
 
@@ -760,13 +760,13 @@ $root.pbgo = (function() {
                     message.id = reader.int32();
                     break;
                 case 2:
-                    message.centerX = reader.int32();
+                    message.centerX = reader.float();
                     break;
                 case 3:
-                    message.centerY = reader.int32();
+                    message.centerY = reader.float();
                     break;
                 case 4:
-                    message.r = reader.int32();
+                    message.r = reader.float();
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -807,14 +807,14 @@ $root.pbgo = (function() {
                 if (!$util.isInteger(message.id))
                     return "id: integer expected";
             if (message.centerX != null && message.hasOwnProperty("centerX"))
-                if (!$util.isInteger(message.centerX))
-                    return "centerX: integer expected";
+                if (typeof message.centerX !== "number")
+                    return "centerX: number expected";
             if (message.centerY != null && message.hasOwnProperty("centerY"))
-                if (!$util.isInteger(message.centerY))
-                    return "centerY: integer expected";
+                if (typeof message.centerY !== "number")
+                    return "centerY: number expected";
             if (message.r != null && message.hasOwnProperty("r"))
-                if (!$util.isInteger(message.r))
-                    return "r: integer expected";
+                if (typeof message.r !== "number")
+                    return "r: number expected";
             return null;
         };
 
@@ -1354,7 +1354,7 @@ $root.pbgo = (function() {
          * Properties of an OperateMsg.
          * @memberof pbgo
          * @interface IOperateMsg
-         * @property {number|null} [opCode] OperateMsg opCode
+         * @property {number|null} [angle] OperateMsg angle
          * @property {number|null} [maxWidth] OperateMsg maxWidth
          * @property {number|null} [maxHeight] OperateMsg maxHeight
          * @property {number|null} [mod] OperateMsg mod
@@ -1376,12 +1376,12 @@ $root.pbgo = (function() {
         }
 
         /**
-         * OperateMsg opCode.
-         * @member {number} opCode
+         * OperateMsg angle.
+         * @member {number} angle
          * @memberof pbgo.OperateMsg
          * @instance
          */
-        OperateMsg.prototype.opCode = 0;
+        OperateMsg.prototype.angle = 0;
 
         /**
          * OperateMsg maxWidth.
@@ -1431,12 +1431,12 @@ $root.pbgo = (function() {
         OperateMsg.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.opCode != null && message.hasOwnProperty("opCode"))
-                writer.uint32(/* id 1, wireType 0 =*/8).int32(message.opCode);
+            if (message.angle != null && message.hasOwnProperty("angle"))
+                writer.uint32(/* id 1, wireType 5 =*/13).float(message.angle);
             if (message.maxWidth != null && message.hasOwnProperty("maxWidth"))
-                writer.uint32(/* id 2, wireType 0 =*/16).int32(message.maxWidth);
+                writer.uint32(/* id 2, wireType 5 =*/21).float(message.maxWidth);
             if (message.maxHeight != null && message.hasOwnProperty("maxHeight"))
-                writer.uint32(/* id 3, wireType 0 =*/24).int32(message.maxHeight);
+                writer.uint32(/* id 3, wireType 5 =*/29).float(message.maxHeight);
             if (message.mod != null && message.hasOwnProperty("mod"))
                 writer.uint32(/* id 4, wireType 0 =*/32).int32(message.mod);
             return writer;
@@ -1474,13 +1474,13 @@ $root.pbgo = (function() {
                 var tag = reader.uint32();
                 switch (tag >>> 3) {
                 case 1:
-                    message.opCode = reader.int32();
+                    message.angle = reader.float();
                     break;
                 case 2:
-                    message.maxWidth = reader.int32();
+                    message.maxWidth = reader.float();
                     break;
                 case 3:
-                    message.maxHeight = reader.int32();
+                    message.maxHeight = reader.float();
                     break;
                 case 4:
                     message.mod = reader.int32();
@@ -1520,15 +1520,15 @@ $root.pbgo = (function() {
         OperateMsg.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
-            if (message.opCode != null && message.hasOwnProperty("opCode"))
-                if (!$util.isInteger(message.opCode))
-                    return "opCode: integer expected";
+            if (message.angle != null && message.hasOwnProperty("angle"))
+                if (typeof message.angle !== "number")
+                    return "angle: number expected";
             if (message.maxWidth != null && message.hasOwnProperty("maxWidth"))
-                if (!$util.isInteger(message.maxWidth))
-                    return "maxWidth: integer expected";
+                if (typeof message.maxWidth !== "number")
+                    return "maxWidth: number expected";
             if (message.maxHeight != null && message.hasOwnProperty("maxHeight"))
-                if (!$util.isInteger(message.maxHeight))
-                    return "maxHeight: integer expected";
+                if (typeof message.maxHeight !== "number")
+                    return "maxHeight: number expected";
             if (message.mod != null && message.hasOwnProperty("mod"))
                 if (!$util.isInteger(message.mod))
                     return "mod: integer expected";
@@ -1613,9 +1613,9 @@ $root.pbgo = (function() {
             if (!writer)
                 writer = $Writer.create();
             if (message.centerX != null && message.hasOwnProperty("centerX"))
-                writer.uint32(/* id 1, wireType 0 =*/8).int32(message.centerX);
+                writer.uint32(/* id 1, wireType 5 =*/13).float(message.centerX);
             if (message.centerY != null && message.hasOwnProperty("centerY"))
-                writer.uint32(/* id 2, wireType 0 =*/16).int32(message.centerY);
+                writer.uint32(/* id 2, wireType 5 =*/21).float(message.centerY);
             if (message.mod != null && message.hasOwnProperty("mod"))
                 writer.uint32(/* id 3, wireType 0 =*/24).int32(message.mod);
             return writer;
@@ -1653,10 +1653,10 @@ $root.pbgo = (function() {
                 var tag = reader.uint32();
                 switch (tag >>> 3) {
                 case 1:
-                    message.centerX = reader.int32();
+                    message.centerX = reader.float();
                     break;
                 case 2:
-                    message.centerY = reader.int32();
+                    message.centerY = reader.float();
                     break;
                 case 3:
                     message.mod = reader.int32();
@@ -1697,11 +1697,11 @@ $root.pbgo = (function() {
             if (typeof message !== "object" || message === null)
                 return "object expected";
             if (message.centerX != null && message.hasOwnProperty("centerX"))
-                if (!$util.isInteger(message.centerX))
-                    return "centerX: integer expected";
+                if (typeof message.centerX !== "number")
+                    return "centerX: number expected";
             if (message.centerY != null && message.hasOwnProperty("centerY"))
-                if (!$util.isInteger(message.centerY))
-                    return "centerY: integer expected";
+                if (typeof message.centerY !== "number")
+                    return "centerY: number expected";
             if (message.mod != null && message.hasOwnProperty("mod"))
                 if (!$util.isInteger(message.mod))
                     return "mod: integer expected";
@@ -1786,11 +1786,11 @@ $root.pbgo = (function() {
             if (!writer)
                 writer = $Writer.create();
             if (message.centerX != null && message.hasOwnProperty("centerX"))
-                writer.uint32(/* id 1, wireType 0 =*/8).int32(message.centerX);
+                writer.uint32(/* id 1, wireType 5 =*/13).float(message.centerX);
             if (message.centerY != null && message.hasOwnProperty("centerY"))
-                writer.uint32(/* id 2, wireType 0 =*/16).int32(message.centerY);
+                writer.uint32(/* id 2, wireType 5 =*/21).float(message.centerY);
             if (message.r != null && message.hasOwnProperty("r"))
-                writer.uint32(/* id 3, wireType 0 =*/24).int32(message.r);
+                writer.uint32(/* id 3, wireType 5 =*/29).float(message.r);
             return writer;
         };
 
@@ -1826,13 +1826,13 @@ $root.pbgo = (function() {
                 var tag = reader.uint32();
                 switch (tag >>> 3) {
                 case 1:
-                    message.centerX = reader.int32();
+                    message.centerX = reader.float();
                     break;
                 case 2:
-                    message.centerY = reader.int32();
+                    message.centerY = reader.float();
                     break;
                 case 3:
-                    message.r = reader.int32();
+                    message.r = reader.float();
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -1870,14 +1870,14 @@ $root.pbgo = (function() {
             if (typeof message !== "object" || message === null)
                 return "object expected";
             if (message.centerX != null && message.hasOwnProperty("centerX"))
-                if (!$util.isInteger(message.centerX))
-                    return "centerX: integer expected";
+                if (typeof message.centerX !== "number")
+                    return "centerX: number expected";
             if (message.centerY != null && message.hasOwnProperty("centerY"))
-                if (!$util.isInteger(message.centerY))
-                    return "centerY: integer expected";
+                if (typeof message.centerY !== "number")
+                    return "centerY: number expected";
             if (message.r != null && message.hasOwnProperty("r"))
-                if (!$util.isInteger(message.r))
-                    return "r: integer expected";
+                if (typeof message.r !== "number")
+                    return "r: number expected";
             return null;
         };
 

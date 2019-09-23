@@ -11,5 +11,5 @@ export default class GlobalConfig extends Laya.Script {
     }
 }
 
-GlobalConfig.wsHost = "172.30.0.5";
+GlobalConfig.wsHost = "129.28.190.44";
 GlobalConfig.wsPort = 1212;

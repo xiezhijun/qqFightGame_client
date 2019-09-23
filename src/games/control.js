@@ -15,12 +15,9 @@ class Control{
         this.direction = new Laya.Sprite; // 方向
         
         this.hero = game.selfPlayerNode;
-        // this.hero.graphics.drawPoly(Laya.stage.width/2, Laya.stage.height/2, [0, 100, 50, 0, 100, 100], "#ffff00");
-        // this.hero.pivot(50,50);
 
         game.owner.addChild(this.round);
         game.owner.addChild(this.direction);
-        game.owner.addChild(this.hero);
 
         Laya.timer.frameLoop(1,this,this.heroMove);
 
@@ -60,13 +57,7 @@ class Control{
 
             //如果距离太小 就代表没动 
             if(dis>3){
-                if(game.selfPlayer.r < 100) {
-                    this.speed = 3;
-                } else if(game.selfPlayer.r < 150) {
-                    this.speed = 2;
-                } else {
-                    this.speed = 1;  //此处还可以通过距离 控制速度
-                }
+                this.speed = game.selfPlayer.speed;
             }else{
                 this.speed = 0;
             }
@@ -101,12 +92,14 @@ class Control{
             game.recalPlayerNode(player);
 
             // send to server
-            let proto = pbgo.UploadPos.create();
-            proto.centerX = player.centerX;
-            proto.centerY = player.centerY;
+            // 只发送操作，服务器同步计算
+            let proto = pbgo.OperateMsg.create();
+            proto.angle = this.angle;
+            proto.maxWidth  = Laya.stage.width;
+            proto.maxHeight = Laya.stage.height;
             proto.mod = game.mod;
             game.mod++;
-            sendMsg(CMD_UPLOAD_POS, proto);
+            sendMsg(CMD_OPERATE, proto);
         }
 
         this.tickFrame();

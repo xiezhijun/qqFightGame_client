@@ -6,11 +6,11 @@ class Player{
         // 昵称
         this.playerName = "";
         // 圆点x
-        this.centerX = 0; 
+        this.centerX = 0.0; 
         // 圆点y
-        this.centerY = 0; 
+        this.centerY = 0.0; 
         // 半径
-        this.r = 0;
+        this.r = 0.0;
         // 速度
         this.speed = 0;
 
@@ -28,11 +28,11 @@ class Food{
         // 唯一标识
         this.id = 0; 
         // 圆点x
-        this.centerX = 0; 
+        this.centerX = 0.0; 
         // 圆点y
-        this.centerY = 0; 
+        this.centerY = 0.0; 
         // 半径
-        this.r = 0;
+        this.r = 0.0;
     }
     
 }
