@@ -821,6 +821,179 @@ $root.pbgo = (function() {
         return Food;
     })();
 
+    pbgo.Chilun = (function() {
+
+        /**
+         * Properties of a Chilun.
+         * @memberof pbgo
+         * @interface IChilun
+         * @property {number|null} [centerX] Chilun centerX
+         * @property {number|null} [centerY] Chilun centerY
+         * @property {number|null} [r] Chilun r
+         */
+
+        /**
+         * Constructs a new Chilun.
+         * @memberof pbgo
+         * @classdesc Represents a Chilun.
+         * @implements IChilun
+         * @constructor
+         * @param {pbgo.IChilun=} [properties] Properties to set
+         */
+        function Chilun(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * Chilun centerX.
+         * @member {number} centerX
+         * @memberof pbgo.Chilun
+         * @instance
+         */
+        Chilun.prototype.centerX = 0;
+
+        /**
+         * Chilun centerY.
+         * @member {number} centerY
+         * @memberof pbgo.Chilun
+         * @instance
+         */
+        Chilun.prototype.centerY = 0;
+
+        /**
+         * Chilun r.
+         * @member {number} r
+         * @memberof pbgo.Chilun
+         * @instance
+         */
+        Chilun.prototype.r = 0;
+
+        /**
+         * Creates a new Chilun instance using the specified properties.
+         * @function create
+         * @memberof pbgo.Chilun
+         * @static
+         * @param {pbgo.IChilun=} [properties] Properties to set
+         * @returns {pbgo.Chilun} Chilun instance
+         */
+        Chilun.create = function create(properties) {
+            return new Chilun(properties);
+        };
+
+        /**
+         * Encodes the specified Chilun message. Does not implicitly {@link pbgo.Chilun.verify|verify} messages.
+         * @function encode
+         * @memberof pbgo.Chilun
+         * @static
+         * @param {pbgo.IChilun} message Chilun message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        Chilun.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.centerX != null && message.hasOwnProperty("centerX"))
+                writer.uint32(/* id 1, wireType 5 =*/13).float(message.centerX);
+            if (message.centerY != null && message.hasOwnProperty("centerY"))
+                writer.uint32(/* id 2, wireType 5 =*/21).float(message.centerY);
+            if (message.r != null && message.hasOwnProperty("r"))
+                writer.uint32(/* id 3, wireType 5 =*/29).float(message.r);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified Chilun message, length delimited. Does not implicitly {@link pbgo.Chilun.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof pbgo.Chilun
+         * @static
+         * @param {pbgo.IChilun} message Chilun message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        Chilun.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a Chilun message from the specified reader or buffer.
+         * @function decode
+         * @memberof pbgo.Chilun
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {pbgo.Chilun} Chilun
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        Chilun.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.pbgo.Chilun();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                case 1:
+                    message.centerX = reader.float();
+                    break;
+                case 2:
+                    message.centerY = reader.float();
+                    break;
+                case 3:
+                    message.r = reader.float();
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a Chilun message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof pbgo.Chilun
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {pbgo.Chilun} Chilun
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        Chilun.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a Chilun message.
+         * @function verify
+         * @memberof pbgo.Chilun
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        Chilun.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.centerX != null && message.hasOwnProperty("centerX"))
+                if (typeof message.centerX !== "number")
+                    return "centerX: number expected";
+            if (message.centerY != null && message.hasOwnProperty("centerY"))
+                if (typeof message.centerY !== "number")
+                    return "centerY: number expected";
+            if (message.r != null && message.hasOwnProperty("r"))
+                if (typeof message.r !== "number")
+                    return "r: number expected";
+            return null;
+        };
+
+        return Chilun;
+    })();
+
     pbgo.EnterGame = (function() {
 
         /**
@@ -969,6 +1142,7 @@ $root.pbgo = (function() {
          * @property {pbgo.IPlayer|null} [self] EnterGameAck self
          * @property {Array.<pbgo.IPlayer>|null} [players] EnterGameAck players
          * @property {Array.<pbgo.IFood>|null} [foods] EnterGameAck foods
+         * @property {Array.<pbgo.IChilun>|null} [chiluns] EnterGameAck chiluns
          */
 
         /**
@@ -982,6 +1156,7 @@ $root.pbgo = (function() {
         function EnterGameAck(properties) {
             this.players = [];
             this.foods = [];
+            this.chiluns = [];
             if (properties)
                 for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null)
@@ -1011,6 +1186,14 @@ $root.pbgo = (function() {
          * @instance
          */
         EnterGameAck.prototype.foods = $util.emptyArray;
+
+        /**
+         * EnterGameAck chiluns.
+         * @member {Array.<pbgo.IChilun>} chiluns
+         * @memberof pbgo.EnterGameAck
+         * @instance
+         */
+        EnterGameAck.prototype.chiluns = $util.emptyArray;
 
         /**
          * Creates a new EnterGameAck instance using the specified properties.
@@ -1044,6 +1227,9 @@ $root.pbgo = (function() {
             if (message.foods != null && message.foods.length)
                 for (var i = 0; i < message.foods.length; ++i)
                     $root.pbgo.Food.encode(message.foods[i], writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+            if (message.chiluns != null && message.chiluns.length)
+                for (var i = 0; i < message.chiluns.length; ++i)
+                    $root.pbgo.Chilun.encode(message.chiluns[i], writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
             return writer;
         };
 
@@ -1090,6 +1276,11 @@ $root.pbgo = (function() {
                     if (!(message.foods && message.foods.length))
                         message.foods = [];
                     message.foods.push($root.pbgo.Food.decode(reader, reader.uint32()));
+                    break;
+                case 4:
+                    if (!(message.chiluns && message.chiluns.length))
+                        message.chiluns = [];
+                    message.chiluns.push($root.pbgo.Chilun.decode(reader, reader.uint32()));
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -1147,6 +1338,15 @@ $root.pbgo = (function() {
                     var error = $root.pbgo.Food.verify(message.foods[i]);
                     if (error)
                         return "foods." + error;
+                }
+            }
+            if (message.chiluns != null && message.hasOwnProperty("chiluns")) {
+                if (!Array.isArray(message.chiluns))
+                    return "chiluns: array expected";
+                for (var i = 0; i < message.chiluns.length; ++i) {
+                    var error = $root.pbgo.Chilun.verify(message.chiluns[i]);
+                    if (error)
+                        return "chiluns." + error;
                 }
             }
             return null;

@@ -19,6 +19,12 @@ message Food {
     float r = 4;
 }
 
+message Chilun {
+    float centerX = 1;
+    float centerY = 2;
+    float r = 3;
+}
+
 // 进入游戏
 message EnterGame {
     int32 playerID = 1;
@@ -28,6 +34,7 @@ message EnterGameAck {
     Player self = 1;
     repeated Player players = 2;
     repeated Food foods = 3;
+    repeated Chilun chiluns = 4;
 }
 
 // 服务器状态推送刷新
@@ -37,7 +44,7 @@ message Refresh {
     int32 selfMod = 3;
 }
 
-// 操作
+// 上下左右操作
 message OperateMsg {
     float angle = 1;
     float maxWidth = 2;

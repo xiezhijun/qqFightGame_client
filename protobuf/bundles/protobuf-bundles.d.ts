@@ -363,6 +363,87 @@ declare namespace pbgo {
         public static verify(message: { [k: string]: any }): (string|null);
     }
 
+    /** Properties of a Chilun. */
+    interface IChilun {
+
+        /** Chilun centerX */
+        centerX?: (number|null);
+
+        /** Chilun centerY */
+        centerY?: (number|null);
+
+        /** Chilun r */
+        r?: (number|null);
+    }
+
+    /** Represents a Chilun. */
+    class Chilun implements IChilun {
+
+        /**
+         * Constructs a new Chilun.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: pbgo.IChilun);
+
+        /** Chilun centerX. */
+        public centerX: number;
+
+        /** Chilun centerY. */
+        public centerY: number;
+
+        /** Chilun r. */
+        public r: number;
+
+        /**
+         * Creates a new Chilun instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns Chilun instance
+         */
+        public static create(properties?: pbgo.IChilun): pbgo.Chilun;
+
+        /**
+         * Encodes the specified Chilun message. Does not implicitly {@link pbgo.Chilun.verify|verify} messages.
+         * @param message Chilun message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: pbgo.IChilun, writer?: protobuf.Writer): protobuf.Writer;
+
+        /**
+         * Encodes the specified Chilun message, length delimited. Does not implicitly {@link pbgo.Chilun.verify|verify} messages.
+         * @param message Chilun message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: pbgo.IChilun, writer?: protobuf.Writer): protobuf.Writer;
+
+        /**
+         * Decodes a Chilun message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns Chilun
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: (protobuf.Reader|Uint8Array), length?: number): pbgo.Chilun;
+
+        /**
+         * Decodes a Chilun message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns Chilun
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: (protobuf.Reader|Uint8Array)): pbgo.Chilun;
+
+        /**
+         * Verifies a Chilun message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+    }
+
     /** Properties of an EnterGame. */
     interface IEnterGame {
 
@@ -443,6 +524,9 @@ declare namespace pbgo {
 
         /** EnterGameAck foods */
         foods?: (pbgo.IFood[]|null);
+
+        /** EnterGameAck chiluns */
+        chiluns?: (pbgo.IChilun[]|null);
     }
 
     /** Represents an EnterGameAck. */
@@ -462,6 +546,9 @@ declare namespace pbgo {
 
         /** EnterGameAck foods. */
         public foods: pbgo.IFood[];
+
+        /** EnterGameAck chiluns. */
+        public chiluns: pbgo.IChilun[];
 
         /**
          * Creates a new EnterGameAck instance using the specified properties.

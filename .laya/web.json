@@ -39,7 +39,7 @@
     ],
     "exclude": true,
     "excludeFilter": [
-        "!$basePath/res/**/*.*"
+        "$basePath/**/*.*"
     ],
     "vexcludeNoteList": [
         ""
@@ -60,5 +60,5 @@
     "forceCompile": false,
     "onlyIndexJS": false,
     "projectType": "js",
-    "pubTime": 1569229062252
+    "pubTime": 1569231067725
 }

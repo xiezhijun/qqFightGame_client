@@ -95,8 +95,11 @@ class Control{
             // 只发送操作，服务器同步计算
             let proto = pbgo.OperateMsg.create();
             proto.angle = this.angle;
-            proto.maxWidth  = Laya.stage.width;
-            proto.maxHeight = Laya.stage.height;
+            // 前面发送后，后面不发送，节省空间
+            // if(game.mod < 5) {
+                proto.maxWidth  = Laya.stage.width;
+                proto.maxHeight = Laya.stage.height;
+            // } 
             proto.mod = game.mod;
             game.mod++;
             sendMsg(CMD_OPERATE, proto);

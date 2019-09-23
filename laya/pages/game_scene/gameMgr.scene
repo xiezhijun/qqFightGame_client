@@ -20,7 +20,7 @@
             "source":"src/games/Game.js",
             "searchKey":"Script,Game",
             "removeAble":true,
-            "props":{"prePlayerSelf":"@Prefab:prefab/PlayerSelf.prefab","prePlayer":"@Prefab:prefab/Player.prefab","preFood":"@Prefab:prefab/Food.prefab"},
+            "props":{"prePlayerSelf":"@Prefab:prefab/PlayerSelf.prefab","prePlayer":"@Prefab:prefab/Player.prefab","preFood":"@Prefab:prefab/Food.prefab","preChilun":"@Prefab:prefab/Chilun.prefab"},
             "nodeParent":2,
             "label":"Game",
             "isDirectory":false,

@@ -15,6 +15,11 @@ export default class Game extends Laya.Script {
         /** @prop {name:prePlayerSelf, tips:"玩家自己预设", type:Prefab, default:null}*/
         this.prePlayerSelf = null;
 
+        /** @prop {name:preChilun, tips:"齿轮预设", type:Prefab, default:null}*/
+        this.preChilun = null;
+
+        this.chiluns = [];
+
         // 玩家自己
         this.selfPlayer = null;
 
@@ -73,6 +78,11 @@ export default class Game extends Laya.Script {
         }
 
         this.frameRefresh();
+
+        for (let index = 0; index < this.chiluns.length; index++) {
+            let element = this.chiluns[index];
+            element.rotation++;
+        }
     }
 
     frameRefresh() {
@@ -285,7 +295,20 @@ export default class Game extends Laya.Script {
             this.createFoodNode(food);
         }
 
+        // 创建刺穿齿轮
+        for (let index = 0; index < enterGameAck.chiluns.length; index++) {
+            let element = enterGameAck.chiluns[index];
+            let chilun = this.preChilun.create();
+            chilun.x = element.centerX - element.r;
+            chilun.y = element.centerY - element.r;
+            chilun.width = element.r * 2;
+            chilun.height = element.r * 2;
+            this.owner.addChild(chilun);
+            this.chiluns.push(chilun);
+        }
+
         this.controller = new(Control);
+
     }
 
     // 服务器通知刷新同步
