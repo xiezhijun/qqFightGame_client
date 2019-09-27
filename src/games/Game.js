@@ -45,7 +45,7 @@ export default class Game extends Laya.Script {
     recalPlayerNode(player) {
         let pNode = this.owner.getChildByName("player" + player.playerID);
         if(pNode == null) {
-            console.log("recal player" +player.playerID+ " node is null");
+            // console.log("recal player" +player.playerID+ " node is null");
             return
         }
         pNode.x = player.centerX - player.r;
@@ -112,10 +112,11 @@ export default class Game extends Laya.Script {
                             this.createPlayerNode(this.selfPlayer);
                             continue;
                         }
+                        // 速度更新
+                        this.selfPlayer.speed = player.speed;
+                        // 
                         if(this.selfPlayer.r < player.r) {
                             this.selfPlayer.r = player.r;
-                            this.selfPlayer.centerX = player.centerX;
-                            this.selfPlayer.centerY = player.centerY;
                             this.recalPlayerNode(this.selfPlayer);
                         }
                         if(msg.selfMod < this.mod) {
@@ -216,7 +217,6 @@ export default class Game extends Laya.Script {
         // 玩家自己进行区分
         let pNode = null;
         if(player.playerID == this.selfPlayer.playerID) {
-            console.log("玩家自己，加载区分的图片....");
             pNode = this.prePlayerSelf.create();
         } else {
             pNode = this.prePlayer.create();
@@ -299,12 +299,18 @@ export default class Game extends Laya.Script {
         for (let index = 0; index < enterGameAck.chiluns.length; index++) {
             let element = enterGameAck.chiluns[index];
             let chilun = this.preChilun.create();
-            chilun.x = element.centerX - element.r;
-            chilun.y = element.centerY - element.r;
+            chilun.x = element.centerX;
+            chilun.y = element.centerY;
             chilun.width = element.r * 2;
             chilun.height = element.r * 2;
+            
             this.owner.addChild(chilun);
             this.chiluns.push(chilun);
+            console.log(chilun.x +"," +chilun.y);
+            console.log("齿轮：（"+element.centerX+","+element.centerX+")");
+            // let sp = new Laya.Sprite();
+            // sp.graphics.drawRect(element.centerX - element.r, element.centerY - element.r, chilun.width, chilun.height, "#000000", "#ffffff", 1);
+            // this.owner.addChild(sp);
         }
 
         this.controller = new(Control);
