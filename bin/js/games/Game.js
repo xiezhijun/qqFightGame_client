@@ -43,6 +43,8 @@ export default class Game extends Laya.Script {
         this.sendEnterGameMsg = false;
 
         this.gameArea = null;
+        this.tipLabel = null; // 顶部提示文字Label
+        this.playerList = null; // 显示控件，玩家list
 
         // 游戏地图的宽高
         this.mapWidth = GlobalConfig.mapWidth;
@@ -79,6 +81,8 @@ export default class Game extends Laya.Script {
         this.owner.getChildByName("GamePanel").getChildByName("GameArea").height = this.mapHeight;
 
         this.gameArea = this.owner.getChildByName("GamePanel").getChildByName("GameArea");
+        this.tipLabel = this.owner.getChildByName("GamePanel").getChildByName("Tip");
+        this.playerList = this.owner.getChildByName("GamePanel").getChildByName("PlayersInfo").getChildByName("PlayerList");
     }
 
     onDisable() {
@@ -131,12 +135,13 @@ export default class Game extends Laya.Script {
                             this.selfPlayer.isDead = false;
                             this.playerMap.set(this.selfPlayer.playerID, this.selfPlayer);
                             this.selfPlayerNode = this.createPlayerNode(this.selfPlayer);
+                            this.tipLabel.visible = false;
                             continue;
                         }
                         // 速度更新
                         this.selfPlayer.speed = player.speed;
                         // 
-                        if(this.selfPlayer.r < player.r) {
+                        if(this.selfPlayer.r != player.r) {
                             this.selfPlayer.r = player.r;
                             this.recalPlayerNode(this.selfPlayer);
                         }
@@ -205,9 +210,11 @@ export default class Game extends Laya.Script {
                             console.log("delete player " + value.playerID);
                             this.playerMap.delete(value.playerID);
                             this.gameArea.getChildByName("player"+value.playerID).destroy();
+                            this.removePlayerInfoNode(value.playerID);
 
                             if(value.playerID == this.selfPlayer.playerID) {
                                 this.selfPlayer.isDead = true;
+                                this.tipLabel.visible = true;
                             }
                         }
                     }
@@ -250,7 +257,45 @@ export default class Game extends Laya.Script {
 
         this.gameArea.addChild(pNode);
         console.log("创建玩家 ::" + player.playerName)
+        this.createPlayerInfoNode(player);
+
         return pNode;
+    }
+
+    // 添加到左侧玩家信息列表
+    createPlayerInfoNode(player) {
+        let pLabel = new(Laya.Label);
+        pLabel.text = player.playerName;
+        pLabel.color = "#000000";
+        pLabel.fontSize = 15;
+        pLabel.align = "center";
+        pLabel.valign = "middle";
+        let container = this.owner.getChildByName("GamePanel").getChildByName("PlayersInfo");
+        pLabel.y = container.numChildren * 50;
+        pLabel.height = 50;
+        pLabel.width = 100;
+        pLabel.name = "pInfoNode" + player.playerID;
+        container.addChild(pLabel);
+
+        let height = container.height;
+        if(height < container.numChildren * 50) {
+            container.height = container.numChildren * 50;
+        }
+    }
+
+    // 从左侧玩家信息列表删除
+    removePlayerInfoNode(playerID) {
+        let container = this.owner.getChildByName("GamePanel").getChildByName("PlayersInfo");
+        let node = container.getChildByName("pInfoNode"+playerID);
+        if(node.y < container.height - 50) {
+            for (let index = 0; index < container.numChildren; index++) {
+                const element = container.getChildAt(index);
+                if(element.y > node.y) {
+                    element.y -= 50;
+                }
+            }
+        }
+        node.destroy();
     }
 
     // 根据food对象创建节点对象
@@ -278,8 +323,6 @@ export default class Game extends Laya.Script {
     enterGame(enterGameAck) {
         console.log('enter game');
         this.controller = new(Control);
-
-
         
         let player = new(Player);
         player.centerX = enterGameAck.self.centerX;
@@ -331,7 +374,6 @@ export default class Game extends Laya.Script {
             this.chiluns.push(chilun);
         }
 
-        
     }
 
     // 服务器通知刷新同步

@@ -2,11 +2,11 @@
     "x":0,
     "type":"View",
     "selectedBox":3,
-    "selecteID":4,
+    "selecteID":8,
     "searchKey":"View",
     "props":{"width":3600,"sceneColor":"#000000","height":3600},
     "nodeParent":-1,
-    "maxID":7,
+    "maxID":11,
     "label":"View",
     "isOpen":true,
     "isDirectory":true,
@@ -40,6 +40,48 @@
                     "compId":4,
                     "child":[
                         ]
+                },
+                {
+                    "x":30,
+                    "type":"Label",
+                    "searchKey":"Label,Tip",
+                    "props":{"x":200,"visible":false,"valign":"middle","text":"您已死亡，即将为您复活！","padding":"30,30,30,30","name":"Tip","fontSize":50,"font":"Microsoft YaHei","color":"#b011aa","bold":true,"align":"center"},
+                    "nodeParent":3,
+                    "label":"Tip",
+                    "isDirectory":false,
+                    "isAniNode":true,
+                    "hasChild":false,
+                    "compId":7,
+                    "child":[
+                        ]
+                },
+                {
+                    "x":30,
+                    "type":"Panel",
+                    "searchKey":"Panel,PlayersInfo",
+                    "props":{"width":100,"name":"PlayersInfo","bgColor":"#fffffff","alpha":0.3},
+                    "nodeParent":3,
+                    "label":"PlayersInfo",
+                    "isOpen":true,
+                    "isDirectory":true,
+                    "isAniNode":true,
+                    "hasChild":true,
+                    "compId":8,
+                    "child":[
+                        {
+                            "x":45,
+                            "type":"Label",
+                            "searchKey":"Label",
+                            "props":{"width":100,"valign":"middle","text":"玩家列表","padding":"10,0,10,0","height":50,"color":"#000000","bold":true,"align":"center"},
+                            "nodeParent":8,
+                            "label":"Label",
+                            "isDirectory":false,
+                            "isAniNode":true,
+                            "hasChild":false,
+                            "compId":9,
+                            "child":[
+                                ]
+                        }]
                 }]
         },
         {
