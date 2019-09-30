@@ -1,4 +1,4 @@
-// v1.5.0
+// v1.3.0
 //是否使用IDE自带的node环境和插件，设置false后，则使用自己环境(使用命令行方式执行)
 const useIDENode = process.argv[0].indexOf("LayaAir") > -1 ? true : false;
 //获取Node插件和工作路径
@@ -23,7 +23,7 @@ global.workSpaceDir = workSpaceDir;
 
 // 结合compile.js使用
 global.publish = true;
-const fileList = ["compile.js", "publish_xmgame.js", "publish_oppogame.js", "publish_vivogame.js", "publish_wxgame.js", "publish_bdgame.js", "publish_qqgame.js"];
+const fileList = ["compile.js", "publish_xmgame.js", "publish_oppogame.js", "publish_vivogame.js"];
 requireDir('./', {
 	filter: function (fullPath) {
 		// 只用到了compile.js和publish.js
@@ -85,6 +85,13 @@ gulp.task("loadConfig", function () {
 	}
 });
 
+// 重新编译项目
+// gulp.task("compile", ["loadConfig"], function () {
+// 	if (config.compile) {
+// 		console.log("compile");
+// 	}
+// });
+
 // 清理release文件夹
 gulp.task("clearReleaseDir", ["compile"], function (cb) {
 	if (config.clearReleaseDir) {
@@ -122,7 +129,7 @@ gulp.task("copyFile", ["clearReleaseDir"], function () {
 	if (platform === "wxgame" && isOpendataProj) { // 开放域项目微信发布，仅拷贝用到的文件
 		config.copyFilesFilter = [`${workSpaceDir}/bin/js/bundle.js`, `${workSpaceDir}/bin/index.js`, `${workSpaceDir}/bin/game.js`];
 		if (config.projectType !== "as") { // 开放域精简类库
-			config.copyFilesFilter.push(`${workSpaceDir}/bin/libs/laya.opendata.js`);
+			config.copyFilesFilter.push(`${workSpaceDir}/bin/libs/laya.opendata.min.js`);
 		}
 	} else if (platform === "wxgame") { // 微信项目，不拷贝index.html，不拷贝百度bin目录中的文件
 		config.copyFilesFilter = baseCopyFilter.concat([`!${workSpaceDir}/bin/index.html`, `!${workSpaceDir}/bin/{project.swan.json,swan-game-adapter.js}`]);
@@ -131,8 +138,8 @@ gulp.task("copyFile", ["clearReleaseDir"], function () {
 	} else { // web|QQ项目|bili|快游戏，不拷贝微信、百度在bin目录中的文件
 		config.copyFilesFilter = baseCopyFilter.concat([`!${workSpaceDir}/bin/{game.js,game.json,project.config.json,weapp-adapter.js,project.swan.json,swan-game-adapter.js}`]);
 	}
-	// bili/alipay/qq，不拷贝index.html
-	if (["biligame", "Alipaygame", "qqgame"].includes(platform)) {
+	// bili，不拷贝index.html
+	if (platform === "biligame" || platform === "Alipaygame") {
 		config.copyFilesFilter = config.copyFilesFilter.concat([`!${workSpaceDir}/bin/index.html`]);
 	}
 	// 快游戏，需要新建一个快游戏项目，拷贝的只是项目的一部分，将文件先拷贝到文件夹的临时目录中去
@@ -142,7 +149,6 @@ gulp.task("copyFile", ["clearReleaseDir"], function () {
 	}
 	if (config.exclude) { // 排除文件
 		config.excludeFilter.forEach(function(item, index, list) {
-			releaseDir = releaseDir.replace(/\\/g, "/");
 			config.excludeFilter[index] = item.replace(releaseDir, binPath);
 		});
 		config.copyFilesFilter = config.copyFilesFilter.concat(config.excludeFilter);
@@ -181,20 +187,135 @@ gulp.task("copyLibsJsFile", ["copyFile"], function () {
 		libsName = item.match(/loadLib\(['"]libs\/([\w-./]+\.(js|wasm))['"]\)/);
 		libsStr += libsStr ? `,${libsName[1]}` : libsName[1];
 	}
-	// 发布web项目，如果使用了physics3D，默认拷贝runtime
-	if (platform === "web" && libsStr.includes("laya.physics3D")) {
-		libsStr += ',laya.physics3D.runtime.js';
-	}
 	let copyLibsList = [`${workSpaceDir}/bin/libs/{${libsStr}}`];
 	if (!libsStr.includes(",")) {
 		copyLibsList = [`${workSpaceDir}/bin/libs/${libsStr}`];
+	}
+	// 微信、百度，需要拷贝对应平台的类库
+	if (platform === "wxgame") {
+		copyLibsList.push(`${workSpaceDir}/bin/libs/laya.wxmini.js`);
+	} else if (platform === "bdgame") {
+		copyLibsList.push(`${workSpaceDir}/bin/libs/laya.bdmini.js`);
 	}
 	var stream = gulp.src(copyLibsList, { base: `${workSpaceDir}/bin` });
 	return stream.pipe(gulp.dest(releaseDir));
 });
 
+// 根据不同的项目类型拷贝平台文件
+gulp.task("copyPlatformFile", ["copyLibsJsFile"], function () {
+	let fileLibsPath;
+	if (useIDENode) {
+		fileLibsPath = path.join(ideModuleDir, "../", "out", "layarepublic", "LayaAirProjectPack", "lib", "data");
+	} else if (process.argv.length >= 8 && process.argv[6] === "--libspath") {
+		fileLibsPath = process.argv[7];
+		console.log("平台文件包是否存在: " + fs.existsSync(fileLibsPath));
+	} else {
+		console.log("没有接收到可用文件包位置，不拷贝对应平台文件");
+		return;
+	}
+	// 开放域项目，微信发布
+	if (platform === "wxgame" && isOpendataProj) {
+		let platformDir = path.join(fileLibsPath, "wxfiles", "weapp-adapter.js");
+		let stream = gulp.src(platformDir);
+		return stream.pipe(gulp.dest(releaseDir));
+	}
+	// 微信项目，非开放域项目
+	if (platform === "wxgame") {
+		// 如果新建项目时已经点击了"微信/百度小游戏bin目录快速调试"，不再拷贝
+		let isHadWXFiles =
+			fs.existsSync(path.join(workSpaceDir, "bin", "game.js")) &&
+			fs.existsSync(path.join(workSpaceDir, "bin", "game.json")) &&
+			fs.existsSync(path.join(workSpaceDir, "bin", "project.config.json")) &&
+			fs.existsSync(path.join(workSpaceDir, "bin", "weapp-adapter.js"));
+		if (isHadWXFiles) {
+			return;
+		}
+		let platformDir = path.join(fileLibsPath, "wxfiles");
+		let stream = gulp.src(platformDir + "/*.*");
+		return stream.pipe(gulp.dest(releaseDir));
+	}
+	// qq玩一玩项目，区分语言
+	if (platform === "qqwanyiwan") {
+		let projectLangDir = config.projectType;
+		let platformDir = path.join(fileLibsPath, "qqfiles", projectLangDir);
+		let stream = gulp.src(platformDir + "/**/*.*");
+		return stream.pipe(gulp.dest(releaseDir));
+	}
+	// 百度项目
+	if (platform === "bdgame") {
+		// 如果新建项目时已经点击了"微信/百度小游戏bin目录快速调试"，不再拷贝
+		let isHadBdFiles =
+			fs.existsSync(path.join(workSpaceDir, "bin", "game.js")) &&
+			fs.existsSync(path.join(workSpaceDir, "bin", "game.json")) &&
+			fs.existsSync(path.join(workSpaceDir, "bin", "project.swan.json")) &&
+			fs.existsSync(path.join(workSpaceDir, "bin", "swan-game-adapter.js"));
+		if (isHadBdFiles) {
+			return;
+		}
+		let platformDir = path.join(fileLibsPath, "bdfiles");
+		let stream = gulp.src(platformDir + "/*.*");
+		return stream.pipe(gulp.dest(releaseDir));
+	}
+});
+
+// 拷贝文件后，针对特定平台修改文件内容
+gulp.task("modifyFile", ["copyPlatformFile"], function () {
+	// QQ玩一玩
+	if (platform === "qqwanyiwan") {
+		// 修改bundle.js
+		let bundleFilePath = path.join(releaseDir, "js", "bundle.js");
+		if (fs.existsSync(bundleFilePath)) {
+			let fileContent = fs.readFileSync(bundleFilePath, "utf8");
+			var appendCode = 'if(window["BK"]&&window["BK"]["Sprite"]){BK.Script.loadlib("GameRes://layaforqq/laya.bkadpter.js");}';
+			if (fileContent.includes("/**LayaGameStart**/") && !fileContent.includes(appendCode)) {
+				fileContent = fileContent.split("/**LayaGameStart**/").join(`/**LayaGameStart**/\n${appendCode}`);
+				fs.writeFileSync(bundleFilePath, fileContent, "utf8");
+			}
+		}
+
+		// 修改index.js
+		let indexFilePath = path.join(releaseDir, "index.js");
+		if (fs.existsSync(indexFilePath)) {
+			let fileContent = fs.readFileSync(indexFilePath, "utf8");
+			fileContent = fileContent.replace(/loadLib\("/g, "BK.Script.loadlib(\"GameRes://");
+			// 非as语言，要添加类库
+			if ("as" !== config.projectType) {
+				if (fileContent.includes("//-----libs-end-------")) {
+					fileContent = fileContent.split("//-----libs-end-------").join(`//-----libs-end-------\nBK.Script.loadlib("GameRes://layaforqq/laya.bkadpter.js");`);
+				}
+			}
+			fs.writeFileSync(indexFilePath, fileContent, "utf8");
+		}
+
+		// 修改main.js
+		let mainFilePath = path.join(releaseDir, "main.js");
+		if (fs.existsSync(mainFilePath)) {
+			let fileContent = fs.readFileSync(mainFilePath, "utf8");
+			fileContent = `BK.Script.loadlib("GameRes://layaforqq/qqPlayCore.js");
+BK.Script.loadlib("GameRes://layaforqq/bkadptpre.js");
+BK.Script.loadlib("GameRes://layaforqq/domparserinone.js");
+BK.Script.loadlib("GameRes://index.js");`;
+			fs.writeFileSync(mainFilePath, fileContent, "utf8");
+		}
+
+		return;
+	}
+
+	// 百度项目，修改index.js
+	if (platform === "bdgame") {
+		let filePath = path.join(releaseDir, "index.js");
+		if (!fs.existsSync(filePath)) {
+			return;
+		}
+		let fileContent = fs.readFileSync(filePath, "utf8");
+		fileContent = fileContent.replace(/loadLib\(/g, "require(");
+		fs.writeFileSync(filePath, fileContent, "utf8");
+		return;
+	}
+});
+
 // 压缩json
-gulp.task("compressJson", ["copyLibsJsFile"], function () {
+gulp.task("compressJson", ["modifyFile"], function () {
 	if (config.compressJson) {
 		return gulp.src(config.compressJsonFilter, { base: releaseDir })
 			.pipe(jsonminify())
@@ -207,9 +328,7 @@ gulp.task("compressJs", ["compressJson"], function () {
 	if (config.compressJs) {
 		return gulp.src(config.compressJsFilter, { base: releaseDir })
 			.pipe(uglify({
-				mangle: {
-					keep_fnames:true
-				}
+				mangle: false
 			}))
 			.on('error', function (err) {
 				console.warn(err.toString());
@@ -244,8 +363,38 @@ gulp.task("compressImage", ["compressJs"], function () {
 	}
 });
 
+// 开放域的情况下，合并game.js和index.js，并删除game.js
+gulp.task("openData", ["compressImage"], function (cb) {
+	if (config.openDataZone) {
+		let indexPath = releaseDir + "/index.js";
+		let indexjs = readFile(indexPath);
+		let gamejs = readFile(releaseDir + "/game.js");
+		if (gamejs && indexjs) {
+			gamejs = gamejs.replace('require("index.js")', indexjs);
+			fs.writeFileSync(indexPath, gamejs, 'utf-8');
+		}
+		if (isOpendataProj) {
+			// 开放域项目，将game.js删掉，发布最小包
+			del(`${releaseDir}/game.js`, { force: true }).then(paths => {
+				cb();
+			}); 
+		} else {
+			cb();
+		}
+	} else {
+		cb();
+	}
+});
+
+function readFile(path) {
+	if (fs.existsSync(path)) {
+		return fs.readFileSync(path, "utf-8");
+	}
+	return null;
+}
+
 // 生成版本管理信息
-gulp.task("version1", ["compressImage"], function () {
+gulp.task("version1", ["openData"], function () {
 	if (config.version) {
 		return gulp.src(config.versionFilter, { base: releaseDir })
 			.pipe(rev())
@@ -309,6 +458,6 @@ gulp.task("packfile", ["version2"], function() {
 });
 
 // 起始任务
-gulp.task("publish", ["buildXiaomiProj", "buildOPPOProj", "buildVivoProj", "buildWXProj", "buildBDProj", "buildQQProj"], function () {
+gulp.task("publish", ["buildXiaomiProj", "buildOPPOProj", "buildVivoProj"], function () {
 	console.log("All tasks completed!");
 });

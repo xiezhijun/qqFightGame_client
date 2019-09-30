@@ -26,13 +26,9 @@
     ],
     "version": true,
     "versionFilter": [
-        "$basePath/**/*.*",
-        "!$basePath/*.html",
-        "!$basePath/{version.json,game.js,game.json,project.config.json,weapp-adapter.js,project.swan.json,swan-game-adapter.js,main.js,gameConfig.json}"
+        "$basePath/**/*.*"
     ],
     "versionNoteList": [
-        "",
-        "",
         ""
     ],
     "exclude": true,
@@ -58,5 +54,5 @@
     "forceCompile": false,
     "onlyIndexJS": false,
     "projectType": "js",
-    "pubTime": 1569753054280
+    "pubTime": 1569829302792
 }

@@ -1,4 +1,4 @@
-// v1.2.0
+// v1.1.1
 // publish 2.x 也是用这个文件，需要做兼容
 let isPublish2 = process.argv[2].includes("publish_xmgame.js") && process.argv[3].includes("--evn=publish2");
 // 获取Node插件和工作路径
@@ -401,7 +401,6 @@ gulp.task("modifyFile_XM", ["deleteSignFile_XM"], function() {
 	manifestJson.package = config.xmInfo.package;
 	manifestJson.name = config.xmInfo.name;
 	manifestJson.orientation = config.xmInfo.orientation;
-	manifestJson.config.logLevel = config.xmInfo.logLevel || "off";
 	manifestJson.versionName = config.xmInfo.versionName;
 	manifestJson.versionCode = config.xmInfo.versionCode;
 	manifestJson.minPlatformVersion = config.xmInfo.minPlatformVersion;

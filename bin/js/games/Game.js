@@ -242,7 +242,7 @@ export default class Game extends Laya.Script {
 
 
         let nameTxtNode = pNode.getChildByName("PlayerName");
-        nameTxtNode.text = player.playerName;
+        nameTxtNode.text = player.playerID;
         nameTxtNode.x = pNode.x;
         nameTxtNode.y = pNode.y;
         nameTxtNode.width = pNode.width;
