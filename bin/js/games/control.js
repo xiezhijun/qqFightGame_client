@@ -14,26 +14,38 @@ class Control{
         this.round = new Laya.Sprite;     // 方向摇盘
         this.direction = new Laya.Sprite; // 方向
         
-        this.hero = game.selfPlayerNode;
+        this.hero = game.selfPlayer;
 
+
+        // game.zOrder =22;
         game.owner.addChild(this.round);
         game.owner.addChild(this.direction);
 
         Laya.timer.frameLoop(1,this,this.tick);
 
-        this.tmp = 0;
+        this.width = Laya.stage.width ;
+        this.height = Laya.stage.height;
     }
 
     // 点击的时候，出现方向盘控制
     mouseDown(){
         this.direction.pos(Laya.stage.mouseX,Laya.stage.mouseY);
-        this.direction.graphics.drawCircle(0, 0, 5, "#0000ff");
-        this.round.graphics.drawCircle(Laya.stage.mouseX, Laya.stage.mouseY, 25, "#00ffff");
+        this.direction.graphics.drawCircle(0, 0, 5, "#ffffff");
+        this.round.graphics.drawCircle(Laya.stage.mouseX, Laya.stage.mouseY, 25, "#000000");
         this.round.graphics.drawCircle(Laya.stage.mouseX, Laya.stage.mouseY, 3, "#ffffff");
         this.centerX = Laya.stage.mouseX;
         this.centerY = Laya.stage.mouseY;
         // 点下后并滑动事件
         Laya.stage.on(Laya.Event.MOUSE_MOVE,this,this.mouseMove);
+
+
+        // 点击缓动
+        // let disx = targetPos.x - this.hero.x;
+        // let disy = targetPos.y - this.hero.y;
+        // let d = Math.sqrt(disx * disx + disy * disy);
+        // let speed = 300;
+        // let time = d / speed;
+        // Laya.Tween.to(this.hero, { x: this.hero.x + disx, y: this.hero.y + disy }, time * 1000)
     }
 
     mouseUp(){
@@ -65,6 +77,13 @@ class Control{
         }
     }
 
+    dis(centerX,centerY,mouseX,mouseY){
+        let dx = centerX - mouseX;
+        let dy = centerY - mouseY;
+        let distance = Math.sqrt(dx*dx+dy*dy);
+        return distance;
+    }
+
     tick(){
         if(this.speed>0){
             let dx = Laya.stage.mouseX - this.centerX;
@@ -80,32 +99,61 @@ class Control{
             if(player.centerX - player.r < 0) {
                 player.centerX = player.r;
             }
-            if(player.centerX + player.r > Laya.stage.width) {
-                player.centerX = Laya.stage.width - player.r;
+            if(player.centerX + player.r > game.mapWidth) {
+                player.centerX = game.mapWidth - player.r;
             }
             if(player.centerY - player.r < 0) {
                 player.centerY = player.r;
             }
-            if(player.centerY + player.r > Laya.stage.height) {
-                player.centerY = Laya.stage.height - player.r;
+            if(player.centerY + player.r > game.mapHeight) {
+                player.centerY = game.mapHeight - player.r;
             }
             game.recalPlayerNode(player);
+
+            //
+            game.gameArea.globalToLocal(Laya.Point.TEMP.setTo(player.centerX, player.centerY));
 
             // send to server
             // 只发送操作，服务器同步计算
             let proto = pbgo.OperateMsg.create();
             proto.angle = this.angle;
-            // 前面发送后，后面不发送，节省空间
-            if(game.mod < 5) {
-                proto.maxWidth  = Laya.stage.width;
-                proto.maxHeight = Laya.stage.height;
-            } 
             proto.mod = game.mod;
             game.mod++;
             sendMsg(CMD_OPERATE, proto);
         }
 
         this.tickFrame();
+        this.mapChange();
+    }
+
+    // 玩家移动，地图视角移动
+    mapChange() {
+        let x, y;
+        if(this.hero == null)
+        {
+            this.hero = game.selfPlayer;
+            return;
+        }
+        if(this.hero.isDead) {
+            return;
+        }
+        if (this.hero.centerX > this.width / 2 && this.hero.centerX < game.mapWidth - this.width / 2) {
+            x = this.width / 2 - this.hero.centerX
+        } else {
+            if (this.hero.centerX <= this.width / 2)
+                x = 0;
+            else
+                x = this.width - game.mapWidth;
+        }
+        if (this.hero.centerY > this.height / 2 && this.hero.centerY < game.mapHeight- this.height / 2) {
+            y = this.height / 2 - this.hero.centerY;
+        } else {
+            if (this.hero.centerY <= this.height / 2)
+                y = 0;
+            else
+                y = this.height - game.mapHeight;
+        }
+        game.gameArea.pos(x, y);
     }
 
     // 将服务器同步的其他玩家的移动数据帧，进行平滑展示
@@ -122,10 +170,4 @@ class Control{
         }
     }
 
-    dis(centerX,centerY,mouseX,mouseY){
-        let dx = centerX - mouseX;
-        let dy = centerY - mouseY;
-        let distance = Math.sqrt(dx*dx+dy*dy);
-        return distance;
-    }
 }

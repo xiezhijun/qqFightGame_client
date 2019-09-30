@@ -1,1 +1,0 @@
-const CMD_LOGIN=1e3,CMD_LOGIN_ACK=1001,CMD_ENTER_GAME=10001,CMD_ENTER_GAME_ACK=10002,CMD_OPERATE=20001,CMD_UPLOAD_POS=20002,CMD_REFRESH=66666;class NetMessage{constructor(){this.msgCmd=0,this.proto=protobuf.Message}}class RespMessage{constructor(){this.msgCmd=0,this.protoBytes=null}}

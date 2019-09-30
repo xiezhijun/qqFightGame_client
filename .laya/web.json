@@ -24,15 +24,13 @@
     "compressJsNoteList": [
         ""
     ],
-    "version": false,
+    "version": true,
     "versionFilter": [
         "$basePath/**/*.*",
         "!$basePath/*.html",
-        "!$basePath/{version.json,game.js,game.json,project.config.json,weapp-adapter.js,project.swan.json,swan-game-adapter.js,main.js,gameConfig.json}",
-        "!$basePath/layaforqq/**/*.*"
+        "!$basePath/{version.json,game.js,game.json,project.config.json,weapp-adapter.js,project.swan.json,swan-game-adapter.js,main.js,gameConfig.json}"
     ],
     "versionNoteList": [
-        "",
         "",
         "",
         ""
@@ -56,9 +54,9 @@
         ""
     ],
     "clearReleaseDir": true,
-    "compile": true,
+    "compile": false,
     "forceCompile": false,
     "onlyIndexJS": false,
     "projectType": "js",
-    "pubTime": 1569567754973
+    "pubTime": 1569753054280
 }

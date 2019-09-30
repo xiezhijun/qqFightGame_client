@@ -606,8 +606,11 @@ declare namespace pbgo {
         /** Refresh players */
         players?: (pbgo.IPlayer[]|null);
 
-        /** Refresh foods */
-        foods?: (pbgo.IFood[]|null);
+        /** Refresh newFoods */
+        newFoods?: (pbgo.IFood[]|null);
+
+        /** Refresh deadFoods */
+        deadFoods?: (number[]|null);
 
         /** Refresh selfMod */
         selfMod?: (number|null);
@@ -625,8 +628,11 @@ declare namespace pbgo {
         /** Refresh players. */
         public players: pbgo.IPlayer[];
 
-        /** Refresh foods. */
-        public foods: pbgo.IFood[];
+        /** Refresh newFoods. */
+        public newFoods: pbgo.IFood[];
+
+        /** Refresh deadFoods. */
+        public deadFoods: number[];
 
         /** Refresh selfMod. */
         public selfMod: number;
@@ -687,12 +693,6 @@ declare namespace pbgo {
         /** OperateMsg angle */
         angle?: (number|null);
 
-        /** OperateMsg maxWidth */
-        maxWidth?: (number|null);
-
-        /** OperateMsg maxHeight */
-        maxHeight?: (number|null);
-
         /** OperateMsg mod */
         mod?: (number|null);
     }
@@ -708,12 +708,6 @@ declare namespace pbgo {
 
         /** OperateMsg angle. */
         public angle: number;
-
-        /** OperateMsg maxWidth. */
-        public maxWidth: number;
-
-        /** OperateMsg maxHeight. */
-        public maxHeight: number;
 
         /** OperateMsg mod. */
         public mod: number;
@@ -762,87 +756,6 @@ declare namespace pbgo {
 
         /**
          * Verifies an OperateMsg message.
-         * @param message Plain object to verify
-         * @returns `null` if valid, otherwise the reason why it is not
-         */
-        public static verify(message: { [k: string]: any }): (string|null);
-    }
-
-    /** Properties of an UploadPos. */
-    interface IUploadPos {
-
-        /** UploadPos centerX */
-        centerX?: (number|null);
-
-        /** UploadPos centerY */
-        centerY?: (number|null);
-
-        /** UploadPos mod */
-        mod?: (number|null);
-    }
-
-    /** Represents an UploadPos. */
-    class UploadPos implements IUploadPos {
-
-        /**
-         * Constructs a new UploadPos.
-         * @param [properties] Properties to set
-         */
-        constructor(properties?: pbgo.IUploadPos);
-
-        /** UploadPos centerX. */
-        public centerX: number;
-
-        /** UploadPos centerY. */
-        public centerY: number;
-
-        /** UploadPos mod. */
-        public mod: number;
-
-        /**
-         * Creates a new UploadPos instance using the specified properties.
-         * @param [properties] Properties to set
-         * @returns UploadPos instance
-         */
-        public static create(properties?: pbgo.IUploadPos): pbgo.UploadPos;
-
-        /**
-         * Encodes the specified UploadPos message. Does not implicitly {@link pbgo.UploadPos.verify|verify} messages.
-         * @param message UploadPos message or plain object to encode
-         * @param [writer] Writer to encode to
-         * @returns Writer
-         */
-        public static encode(message: pbgo.IUploadPos, writer?: protobuf.Writer): protobuf.Writer;
-
-        /**
-         * Encodes the specified UploadPos message, length delimited. Does not implicitly {@link pbgo.UploadPos.verify|verify} messages.
-         * @param message UploadPos message or plain object to encode
-         * @param [writer] Writer to encode to
-         * @returns Writer
-         */
-        public static encodeDelimited(message: pbgo.IUploadPos, writer?: protobuf.Writer): protobuf.Writer;
-
-        /**
-         * Decodes an UploadPos message from the specified reader or buffer.
-         * @param reader Reader or buffer to decode from
-         * @param [length] Message length if known beforehand
-         * @returns UploadPos
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {protobuf.util.ProtocolError} If required fields are missing
-         */
-        public static decode(reader: (protobuf.Reader|Uint8Array), length?: number): pbgo.UploadPos;
-
-        /**
-         * Decodes an UploadPos message from the specified reader or buffer, length delimited.
-         * @param reader Reader or buffer to decode from
-         * @returns UploadPos
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {protobuf.util.ProtocolError} If required fields are missing
-         */
-        public static decodeDelimited(reader: (protobuf.Reader|Uint8Array)): pbgo.UploadPos;
-
-        /**
-         * Verifies an UploadPos message.
          * @param message Plain object to verify
          * @returns `null` if valid, otherwise the reason why it is not
          */

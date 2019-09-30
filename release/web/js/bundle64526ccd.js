@@ -262,7 +262,7 @@
 
 
             let nameTxtNode = pNode.getChildByName("PlayerName");
-            nameTxtNode.text = player.playerID;
+            nameTxtNode.text = player.playerName;
             nameTxtNode.x = pNode.x;
             nameTxtNode.y = pNode.y;
             nameTxtNode.width = pNode.width;

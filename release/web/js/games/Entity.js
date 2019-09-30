@@ -1,1 +1,0 @@
-class Player{constructor(){this.playerID=0,this.playerName="",this.centerX=0,this.centerY=0,this.r=0,this.speed=0,this.isDead=!1,this.moveFrames=[]}}class Food{constructor(){this.id=0,this.centerX=0,this.centerY=0,this.r=0}}

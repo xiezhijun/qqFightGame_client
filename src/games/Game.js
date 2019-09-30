@@ -1,3 +1,5 @@
+import GlobalConfig from "../GlobalConfig";
+
 export default class Game extends Laya.Script {
 
     constructor() { 
@@ -39,11 +41,17 @@ export default class Game extends Laya.Script {
         this.controller = null;
 
         this.sendEnterGameMsg = false;
+
+        this.gameArea = null;
+
+        // 游戏地图的宽高
+        this.mapWidth = GlobalConfig.mapWidth;
+        this.mapHeight = GlobalConfig.mapHeight;
     }
 
     // 重新计算
     recalPlayerNode(player) {
-        let pNode = this.owner.getChildByName("player" + player.playerID);
+        let pNode = this.gameArea.getChildByName("player" + player.playerID);
         if(pNode == null) {
             // console.log("recal player" +player.playerID+ " node is null");
             return
@@ -61,6 +69,16 @@ export default class Game extends Laya.Script {
     
     onEnable() {
         game = this;
+        this.owner.width = this.mapWidth;
+        this.owner.height = this.mapHeight;
+
+        this.owner.getChildByName("GamePanel").width = this.mapWidth;
+        this.owner.getChildByName("GamePanel").height = this.mapHeight;
+
+        this.owner.getChildByName("GamePanel").getChildByName("GameArea").width = this.mapWidth;
+        this.owner.getChildByName("GamePanel").getChildByName("GameArea").height = this.mapHeight;
+
+        this.gameArea = this.owner.getChildByName("GamePanel").getChildByName("GameArea");
     }
 
     onDisable() {
@@ -86,6 +104,9 @@ export default class Game extends Laya.Script {
     }
 
     frameRefresh() {
+        if(this.selfPlayer == null){
+            return;
+        }
         let num = this.refreshMsgArray.length;
         if(num > 0) {
             // 每帧处理的消息设定最大值，防止帧数太低
@@ -109,7 +130,7 @@ export default class Game extends Laya.Script {
                             this.selfPlayer.mod = player.mod;
                             this.selfPlayer.isDead = false;
                             this.playerMap.set(this.selfPlayer.playerID, this.selfPlayer);
-                            this.createPlayerNode(this.selfPlayer);
+                            this.selfPlayerNode = this.createPlayerNode(this.selfPlayer);
                             continue;
                         }
                         // 速度更新
@@ -154,9 +175,9 @@ export default class Game extends Laya.Script {
                     }
                 }
                 
-                for (const idx in msg.foods) {
-                    let food = msg.foods[idx];
-                    let foodNode = this.owner.getChildByName("food" + food.id);
+                for (const idx in msg.newFoods) {
+                    let food = msg.newFoods[idx];
+                    let foodNode = this.gameArea.getChildByName("food" + food.id);
                     if(foodNode == null) {
                         foodNode = this.createFoodNode(food);
                     }
@@ -183,7 +204,7 @@ export default class Game extends Laya.Script {
                         if(!found) {
                             console.log("delete player " + value.playerID);
                             this.playerMap.delete(value.playerID);
-                            this.owner.getChildByName("player"+value.playerID).destroy();
+                            this.gameArea.getChildByName("player"+value.playerID).destroy();
 
                             if(value.playerID == this.selfPlayer.playerID) {
                                 this.selfPlayer.isDead = true;
@@ -192,20 +213,11 @@ export default class Game extends Laya.Script {
                     }
 
                     // food
-                    for(let value of this.foodMap.values()) {
-                        let found = false;
-                        for (const idx in msg.foods) {
-                            let food = msg.foods[idx];
-                            if(food.id == value.id) {
-                                found = true;
-                                break;
-                            }
-                        }
-                        if(!found) {
-                            // console.log("delete food " + value.id);
-                            this.foodMap.delete(value.id);
-                            this.owner.getChildByName("food"+value.id).destroy();
-                        }
+                    for (const idx in msg.deadFoods) {
+                        let foodId = msg.deadFoods[idx];
+                        // console.log("delete food " + foodId);
+                        this.foodMap.delete(foodId);
+                        this.gameArea.getChildByName("food"+foodId).destroy();
                     }
                 }
             }
@@ -230,13 +242,13 @@ export default class Game extends Laya.Script {
 
 
         let nameTxtNode = pNode.getChildByName("PlayerName");
-        nameTxtNode.text = player.playerName;
+        nameTxtNode.text = player.playerID;
         nameTxtNode.x = pNode.x;
         nameTxtNode.y = pNode.y;
         nameTxtNode.width = pNode.width;
         nameTxtNode.height = pNode.height;
 
-        this.owner.addChild(pNode);
+        this.gameArea.addChild(pNode);
         console.log("创建玩家 ::" + player.playerName)
         return pNode;
     }
@@ -249,13 +261,24 @@ export default class Game extends Laya.Script {
         fNode.width = food.r * 2;
         fNode.height = fNode.width;
         fNode.name = "food" + food.id;
-        this.owner.addChild(fNode);
+        // console.log("create food :" + food.id);
+
+        let value = food.id % 3;
+        if(value == 1) {
+            fNode.texture = "img/cir_red.png";
+        } else if(value == 2) {
+            fNode.texture = "img/cir_pink.png";
+        }
+
+        this.gameArea.addChild(fNode);
         return fNode;
     }
 
     // 进入游戏
     enterGame(enterGameAck) {
         console.log('enter game');
+        this.controller = new(Control);
+
 
         
         let player = new(Player);
@@ -283,7 +306,7 @@ export default class Game extends Laya.Script {
             this.createPlayerNode(player);
         }
 
-        for (let index = 0; index < enterGameAck.players.length; index++) {
+        for (let index = 0; index < enterGameAck.foods.length; index++) {
             let element = enterGameAck.foods[index];
             let food = new(Food);
             food.centerX = element.centerX;
@@ -304,17 +327,11 @@ export default class Game extends Laya.Script {
             chilun.width = element.r * 2;
             chilun.height = element.r * 2;
             
-            this.owner.addChild(chilun);
+            this.gameArea.addChild(chilun);
             this.chiluns.push(chilun);
-            console.log(chilun.x +"," +chilun.y);
-            console.log("齿轮：（"+element.centerX+","+element.centerX+")");
-            // let sp = new Laya.Sprite();
-            // sp.graphics.drawRect(element.centerX - element.r, element.centerY - element.r, chilun.width, chilun.height, "#000000", "#ffffff", 1);
-            // this.owner.addChild(sp);
         }
 
-        this.controller = new(Control);
-
+        
     }
 
     // 服务器通知刷新同步

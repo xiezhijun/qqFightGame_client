@@ -40,23 +40,15 @@ message EnterGameAck {
 // 服务器状态推送刷新
 message Refresh {
     repeated Player players = 1;
-    repeated Food foods = 2;
-    int32 selfMod = 3;
+    repeated Food newFoods = 2;
+    repeated int32 deadFoods = 3;
+    int32 selfMod = 4;
 }
 
 // 上下左右操作
 message OperateMsg {
     float angle = 1;
-    float maxWidth = 2;
-    float maxHeight = 3;
-    int32 mod = 4;
-}
-
-// 客户端计算后，上报位置
-message UploadPos {
-    float centerX = 1;
-    float centerY = 2;
-    int32 mod = 3;
+    int32 mod = 2;
 }
 
 // 移动数据帧

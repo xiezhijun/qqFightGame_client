@@ -1,1 +1,0 @@
-var CLASS$=Laya.class,STATICATTR$=Laya.static,View=laya.ui.View,Dialog=laya.ui.Dialog,Scene=Laya.Scene;window.ui||(window.ui={});export{ui as default};

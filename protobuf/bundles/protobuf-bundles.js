@@ -1362,7 +1362,8 @@ $root.pbgo = (function() {
          * @memberof pbgo
          * @interface IRefresh
          * @property {Array.<pbgo.IPlayer>|null} [players] Refresh players
-         * @property {Array.<pbgo.IFood>|null} [foods] Refresh foods
+         * @property {Array.<pbgo.IFood>|null} [newFoods] Refresh newFoods
+         * @property {Array.<number>|null} [deadFoods] Refresh deadFoods
          * @property {number|null} [selfMod] Refresh selfMod
          */
 
@@ -1376,7 +1377,8 @@ $root.pbgo = (function() {
          */
         function Refresh(properties) {
             this.players = [];
-            this.foods = [];
+            this.newFoods = [];
+            this.deadFoods = [];
             if (properties)
                 for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null)
@@ -1392,12 +1394,20 @@ $root.pbgo = (function() {
         Refresh.prototype.players = $util.emptyArray;
 
         /**
-         * Refresh foods.
-         * @member {Array.<pbgo.IFood>} foods
+         * Refresh newFoods.
+         * @member {Array.<pbgo.IFood>} newFoods
          * @memberof pbgo.Refresh
          * @instance
          */
-        Refresh.prototype.foods = $util.emptyArray;
+        Refresh.prototype.newFoods = $util.emptyArray;
+
+        /**
+         * Refresh deadFoods.
+         * @member {Array.<number>} deadFoods
+         * @memberof pbgo.Refresh
+         * @instance
+         */
+        Refresh.prototype.deadFoods = $util.emptyArray;
 
         /**
          * Refresh selfMod.
@@ -1434,11 +1444,17 @@ $root.pbgo = (function() {
             if (message.players != null && message.players.length)
                 for (var i = 0; i < message.players.length; ++i)
                     $root.pbgo.Player.encode(message.players[i], writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-            if (message.foods != null && message.foods.length)
-                for (var i = 0; i < message.foods.length; ++i)
-                    $root.pbgo.Food.encode(message.foods[i], writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+            if (message.newFoods != null && message.newFoods.length)
+                for (var i = 0; i < message.newFoods.length; ++i)
+                    $root.pbgo.Food.encode(message.newFoods[i], writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+            if (message.deadFoods != null && message.deadFoods.length) {
+                writer.uint32(/* id 3, wireType 2 =*/26).fork();
+                for (var i = 0; i < message.deadFoods.length; ++i)
+                    writer.int32(message.deadFoods[i]);
+                writer.ldelim();
+            }
             if (message.selfMod != null && message.hasOwnProperty("selfMod"))
-                writer.uint32(/* id 3, wireType 0 =*/24).int32(message.selfMod);
+                writer.uint32(/* id 4, wireType 0 =*/32).int32(message.selfMod);
             return writer;
         };
 
@@ -1479,11 +1495,21 @@ $root.pbgo = (function() {
                     message.players.push($root.pbgo.Player.decode(reader, reader.uint32()));
                     break;
                 case 2:
-                    if (!(message.foods && message.foods.length))
-                        message.foods = [];
-                    message.foods.push($root.pbgo.Food.decode(reader, reader.uint32()));
+                    if (!(message.newFoods && message.newFoods.length))
+                        message.newFoods = [];
+                    message.newFoods.push($root.pbgo.Food.decode(reader, reader.uint32()));
                     break;
                 case 3:
+                    if (!(message.deadFoods && message.deadFoods.length))
+                        message.deadFoods = [];
+                    if ((tag & 7) === 2) {
+                        var end2 = reader.uint32() + reader.pos;
+                        while (reader.pos < end2)
+                            message.deadFoods.push(reader.int32());
+                    } else
+                        message.deadFoods.push(reader.int32());
+                    break;
+                case 4:
                     message.selfMod = reader.int32();
                     break;
                 default:
@@ -1530,14 +1556,21 @@ $root.pbgo = (function() {
                         return "players." + error;
                 }
             }
-            if (message.foods != null && message.hasOwnProperty("foods")) {
-                if (!Array.isArray(message.foods))
-                    return "foods: array expected";
-                for (var i = 0; i < message.foods.length; ++i) {
-                    var error = $root.pbgo.Food.verify(message.foods[i]);
+            if (message.newFoods != null && message.hasOwnProperty("newFoods")) {
+                if (!Array.isArray(message.newFoods))
+                    return "newFoods: array expected";
+                for (var i = 0; i < message.newFoods.length; ++i) {
+                    var error = $root.pbgo.Food.verify(message.newFoods[i]);
                     if (error)
-                        return "foods." + error;
+                        return "newFoods." + error;
                 }
+            }
+            if (message.deadFoods != null && message.hasOwnProperty("deadFoods")) {
+                if (!Array.isArray(message.deadFoods))
+                    return "deadFoods: array expected";
+                for (var i = 0; i < message.deadFoods.length; ++i)
+                    if (!$util.isInteger(message.deadFoods[i]))
+                        return "deadFoods: integer[] expected";
             }
             if (message.selfMod != null && message.hasOwnProperty("selfMod"))
                 if (!$util.isInteger(message.selfMod))
@@ -1555,8 +1588,6 @@ $root.pbgo = (function() {
          * @memberof pbgo
          * @interface IOperateMsg
          * @property {number|null} [angle] OperateMsg angle
-         * @property {number|null} [maxWidth] OperateMsg maxWidth
-         * @property {number|null} [maxHeight] OperateMsg maxHeight
          * @property {number|null} [mod] OperateMsg mod
          */
 
@@ -1582,22 +1613,6 @@ $root.pbgo = (function() {
          * @instance
          */
         OperateMsg.prototype.angle = 0;
-
-        /**
-         * OperateMsg maxWidth.
-         * @member {number} maxWidth
-         * @memberof pbgo.OperateMsg
-         * @instance
-         */
-        OperateMsg.prototype.maxWidth = 0;
-
-        /**
-         * OperateMsg maxHeight.
-         * @member {number} maxHeight
-         * @memberof pbgo.OperateMsg
-         * @instance
-         */
-        OperateMsg.prototype.maxHeight = 0;
 
         /**
          * OperateMsg mod.
@@ -1633,12 +1648,8 @@ $root.pbgo = (function() {
                 writer = $Writer.create();
             if (message.angle != null && message.hasOwnProperty("angle"))
                 writer.uint32(/* id 1, wireType 5 =*/13).float(message.angle);
-            if (message.maxWidth != null && message.hasOwnProperty("maxWidth"))
-                writer.uint32(/* id 2, wireType 5 =*/21).float(message.maxWidth);
-            if (message.maxHeight != null && message.hasOwnProperty("maxHeight"))
-                writer.uint32(/* id 3, wireType 5 =*/29).float(message.maxHeight);
             if (message.mod != null && message.hasOwnProperty("mod"))
-                writer.uint32(/* id 4, wireType 0 =*/32).int32(message.mod);
+                writer.uint32(/* id 2, wireType 0 =*/16).int32(message.mod);
             return writer;
         };
 
@@ -1677,12 +1688,6 @@ $root.pbgo = (function() {
                     message.angle = reader.float();
                     break;
                 case 2:
-                    message.maxWidth = reader.float();
-                    break;
-                case 3:
-                    message.maxHeight = reader.float();
-                    break;
-                case 4:
                     message.mod = reader.int32();
                     break;
                 default:
@@ -1723,12 +1728,6 @@ $root.pbgo = (function() {
             if (message.angle != null && message.hasOwnProperty("angle"))
                 if (typeof message.angle !== "number")
                     return "angle: number expected";
-            if (message.maxWidth != null && message.hasOwnProperty("maxWidth"))
-                if (typeof message.maxWidth !== "number")
-                    return "maxWidth: number expected";
-            if (message.maxHeight != null && message.hasOwnProperty("maxHeight"))
-                if (typeof message.maxHeight !== "number")
-                    return "maxHeight: number expected";
             if (message.mod != null && message.hasOwnProperty("mod"))
                 if (!$util.isInteger(message.mod))
                     return "mod: integer expected";
@@ -1736,179 +1735,6 @@ $root.pbgo = (function() {
         };
 
         return OperateMsg;
-    })();
-
-    pbgo.UploadPos = (function() {
-
-        /**
-         * Properties of an UploadPos.
-         * @memberof pbgo
-         * @interface IUploadPos
-         * @property {number|null} [centerX] UploadPos centerX
-         * @property {number|null} [centerY] UploadPos centerY
-         * @property {number|null} [mod] UploadPos mod
-         */
-
-        /**
-         * Constructs a new UploadPos.
-         * @memberof pbgo
-         * @classdesc Represents an UploadPos.
-         * @implements IUploadPos
-         * @constructor
-         * @param {pbgo.IUploadPos=} [properties] Properties to set
-         */
-        function UploadPos(properties) {
-            if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
-        }
-
-        /**
-         * UploadPos centerX.
-         * @member {number} centerX
-         * @memberof pbgo.UploadPos
-         * @instance
-         */
-        UploadPos.prototype.centerX = 0;
-
-        /**
-         * UploadPos centerY.
-         * @member {number} centerY
-         * @memberof pbgo.UploadPos
-         * @instance
-         */
-        UploadPos.prototype.centerY = 0;
-
-        /**
-         * UploadPos mod.
-         * @member {number} mod
-         * @memberof pbgo.UploadPos
-         * @instance
-         */
-        UploadPos.prototype.mod = 0;
-
-        /**
-         * Creates a new UploadPos instance using the specified properties.
-         * @function create
-         * @memberof pbgo.UploadPos
-         * @static
-         * @param {pbgo.IUploadPos=} [properties] Properties to set
-         * @returns {pbgo.UploadPos} UploadPos instance
-         */
-        UploadPos.create = function create(properties) {
-            return new UploadPos(properties);
-        };
-
-        /**
-         * Encodes the specified UploadPos message. Does not implicitly {@link pbgo.UploadPos.verify|verify} messages.
-         * @function encode
-         * @memberof pbgo.UploadPos
-         * @static
-         * @param {pbgo.IUploadPos} message UploadPos message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        UploadPos.encode = function encode(message, writer) {
-            if (!writer)
-                writer = $Writer.create();
-            if (message.centerX != null && message.hasOwnProperty("centerX"))
-                writer.uint32(/* id 1, wireType 5 =*/13).float(message.centerX);
-            if (message.centerY != null && message.hasOwnProperty("centerY"))
-                writer.uint32(/* id 2, wireType 5 =*/21).float(message.centerY);
-            if (message.mod != null && message.hasOwnProperty("mod"))
-                writer.uint32(/* id 3, wireType 0 =*/24).int32(message.mod);
-            return writer;
-        };
-
-        /**
-         * Encodes the specified UploadPos message, length delimited. Does not implicitly {@link pbgo.UploadPos.verify|verify} messages.
-         * @function encodeDelimited
-         * @memberof pbgo.UploadPos
-         * @static
-         * @param {pbgo.IUploadPos} message UploadPos message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        UploadPos.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
-        };
-
-        /**
-         * Decodes an UploadPos message from the specified reader or buffer.
-         * @function decode
-         * @memberof pbgo.UploadPos
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @param {number} [length] Message length if known beforehand
-         * @returns {pbgo.UploadPos} UploadPos
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        UploadPos.decode = function decode(reader, length) {
-            if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.pbgo.UploadPos();
-            while (reader.pos < end) {
-                var tag = reader.uint32();
-                switch (tag >>> 3) {
-                case 1:
-                    message.centerX = reader.float();
-                    break;
-                case 2:
-                    message.centerY = reader.float();
-                    break;
-                case 3:
-                    message.mod = reader.int32();
-                    break;
-                default:
-                    reader.skipType(tag & 7);
-                    break;
-                }
-            }
-            return message;
-        };
-
-        /**
-         * Decodes an UploadPos message from the specified reader or buffer, length delimited.
-         * @function decodeDelimited
-         * @memberof pbgo.UploadPos
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {pbgo.UploadPos} UploadPos
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        UploadPos.decodeDelimited = function decodeDelimited(reader) {
-            if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
-            return this.decode(reader, reader.uint32());
-        };
-
-        /**
-         * Verifies an UploadPos message.
-         * @function verify
-         * @memberof pbgo.UploadPos
-         * @static
-         * @param {Object.<string,*>} message Plain object to verify
-         * @returns {string|null} `null` if valid, otherwise the reason why it is not
-         */
-        UploadPos.verify = function verify(message) {
-            if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.centerX != null && message.hasOwnProperty("centerX"))
-                if (typeof message.centerX !== "number")
-                    return "centerX: number expected";
-            if (message.centerY != null && message.hasOwnProperty("centerY"))
-                if (typeof message.centerY !== "number")
-                    return "centerY: number expected";
-            if (message.mod != null && message.hasOwnProperty("mod"))
-                if (!$util.isInteger(message.mod))
-                    return "mod: integer expected";
-            return null;
-        };
-
-        return UploadPos;
     })();
 
     pbgo.MoveFrame = (function() {

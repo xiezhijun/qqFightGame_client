@@ -1,13 +1,6 @@
-export default class GlobalConfig extends Laya.Script {
+export default class GlobalConfig {
 
-    constructor() { 
-        super(); 
-    }
-    
-    onEnable() {
-    }
-
-    onDisable() {
+    constructor() {
     }
 }
 
@@ -20,3 +13,6 @@ GlobalConfig.wsPort = 1212;
 if(GlobalConfig.isTest) {
     GlobalConfig.wsHost = "127.0.0.1";
 }
+
+GlobalConfig.mapWidth = 2500;
+GlobalConfig.mapHeight = 2500;
